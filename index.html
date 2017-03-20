@@ -17,25 +17,17 @@
     }
   </style>
   <script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+  <script src="https://unpkg.com/tween.js@16.3.4"></script>
   <script src="https://unpkg.com/element-ui/lib/index.js"></script>
   <script>
     window.onload = () => {
       let app = new Vue({
         el: '#app',
         data: {
+          tab: 'overview',
           btc_usd: null,
 
           positions: [
-            {
-              coin: 'VOX',
-              amount: 1447.75036284,
-              amount_btc: 0.00997097,
-              rate_btc: null,
-              worth_btc: null,
-              change: null,
-              pl: null
-            },
-
             {
               coin: 'NSR',
               amount: 71250,
@@ -128,6 +120,12 @@
           ]
         },
 
+        computed: {
+          btc_price: function () {
+            return 'BTC/USD: $' + parseInt(this.btc_usd);
+          }
+        },
+
         methods: {
           getRowClassName(row, index) {
             if (row.change < -5) {
@@ -135,8 +133,16 @@
             } else if (row.change > 5) {
               return 'green';
             }
-            
+
             return '';
+          },
+
+          getChangeFormatter(row, column) {
+            return row.change + '%';
+          },
+
+          getPLFormatter(row, column) {
+            return row.pl < 0 ? '-$' + Math.abs(row.pl) : '$' + row.pl;
           }
         }
       });
@@ -179,24 +185,74 @@
     Number.prototype.round = function (places) {
       return +(Math.round(this + "e+" + places) + "e-" + places);
     }
+
+    Vue.component('animated-integer', {
+      template: '<span>{{ tweeningValue }}</span>',
+      props: {
+        value: {
+          type: Number,
+          required: true
+        }
+      },
+      data: function () {
+        return {
+          tweeningValue: 0
+        }
+      },
+      watch: {
+        value: function (newValue, oldValue) {
+          this.tween(oldValue, newValue)
+        }
+      },
+      mounted: function () {
+        this.tween(0, this.value)
+      },
+      methods: {
+        tween: function (startValue, endValue) {
+          var vm = this
+          var animationFrame
+          function animate(time) {
+            TWEEN.update(time)
+            animationFrame = requestAnimationFrame(animate)
+          }
+          new TWEEN.Tween({ tweeningValue: startValue })
+            .to({ tweeningValue: endValue }, 500)
+            .onUpdate(function () {
+              vm.tweeningValue = this.tweeningValue.toFixed(0)
+            })
+            .onComplete(function () {
+              cancelAnimationFrame(animationFrame)
+            })
+            .start()
+          animationFrame = requestAnimationFrame(animate)
+        }
+      }
+    })
   </script>
 </head>
 
 <body>
   <div id="app">
-    <h3>BTC/USD: {{ btc_usd }}</h3>
+    <el-tabs v-model="tab">
+      <el-tab-pane label="Overview" name="overview">
+        <el-row>
+          <el-col :span="24">
+            <el-table :data="positions" :row-class-name="getRowClassName" border style="width: 100%">
+              <el-table-column prop="coin" label="Coin" width="100"></el-table-column>
+              <el-table-column prop="amount" label="Amount" width="170"></el-table-column>
+              <el-table-column prop="amount_btc" label="Amount (BTC)"></el-table-column>
+              <el-table-column prop="rate_btc" label="Rate (BTC)"></el-table-column>
+              <el-table-column prop="worth_btc" label="Worth (BTC)"></el-table-column>
+              <el-table-column prop="change" label="Change" align="center" :formatter="getChangeFormatter"></el-table-column>
+              <el-table-column prop="pl" label="P/L" width="120" align="center" :formatter="getPLFormatter"></el-table-column>
+            </el-table>
+          </el-col>
+        </el-row>
+      </el-tab-pane>
+      <el-tab-pane label="Settings" name="settings">Settings...</el-tab-pane>
+      <el-tab-pane v-bind:label="btc_price" name="btcprice" disabled="true"></el-tab-pane>
+    </el-tabs>
 
-    <template>
-      <el-table :data="positions" :row-class-name="getRowClassName" border style="width: 100%">
-        <el-table-column prop="coin" label="Coin" width="100"></el-table-column>
-        <el-table-column prop="amount" label="Amount" width="170"></el-table-column>
-        <el-table-column prop="amount_btc" label="Amount (BTC)"></el-table-column>
-        <el-table-column prop="rate_btc" label="Rate (BTC)"></el-table-column>
-        <el-table-column prop="worth_btc" label="Worth (BTC)"></el-table-column>
-        <el-table-column prop="change" label="Change"></el-table-column>
-        <el-table-column prop="pl" label="P/L" width="120"></el-table-column>
-      </el-table>
-    </template>
   </div>
 </body>
 
