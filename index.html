@@ -34,7 +34,7 @@
           <el-col :span="24">
             <el-table :data="positions" :row-class-name="getRowClassName" border style="width: 100%">
               <el-table-column prop="coin" label="Coin" width="100"></el-table-column>
-              <el-table-column prop="amount" label="Amount" v-if="$mq.resize && $mq.above('480px')"></el-table-column>
+              <el-table-column prop="amount" label="Amount" width="170" v-if="$mq.resize && $mq.above('480px')"></el-table-column>
               <el-table-column prop="amount_btc" label="Amount (BTC)" v-if="$mq.resize && $mq.above('1200px')"></el-table-column>
               <el-table-column prop="rate_btc" label="Rate (BTC)" v-if="$mq.resize && $mq.above('1200px')"></el-table-column>
               <el-table-column prop="worth_btc" label="Worth (BTC)" v-if="$mq.resize && $mq.above('480px')"></el-table-column>
