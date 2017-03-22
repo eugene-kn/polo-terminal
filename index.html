@@ -17,13 +17,26 @@
     }
   </style>
   <script src="https://unpkg.com/vue/dist/vue.min.js"></script>
-  <script src="https://unpkg.com/tween.js@16.3.4"></script>
+  <script src="https://unpkg.com/localforage@1.5.0/dist/localforage.min.js"></script>
+  <!--<script src="https://unpkg.com/tween.js@16.3.4"></script>-->
   <script src="https://unpkg.com/element-ui/lib/index.js"></script>
   <script>
     window.onload = () => {
+      localforage.config({
+        driver: localforage.LOCALSTORAGE,
+        name: 'polo-terminal'
+      });
+
       let app = new Vue({
         el: '#app',
+
         data: {
+          settings: {
+            apiKey: null,
+            secret: null
+          },
+
+          message: null,
           tab: 'overview',
           btc_usd: null,
 
@@ -32,16 +45,6 @@
               coin: 'BBR',
               amount: 71.24999999,
               amount_btc: 0.01998983,
-              rate_btc: null,
-              worth_btc: null,
-              change: null,
-              pl: null
-            },
-
-            {
-              coin: 'FLDC',
-              amount: 9151.37614678,
-              amount_btc: 0.00999999,
               rate_btc: null,
               worth_btc: null,
               change: null,
@@ -110,6 +113,10 @@
           ]
         },
 
+        created: function () {
+          this.loadSettings();
+        },
+
         computed: {
           btc_price: function () {
             return 'BTC/USD: $' + parseInt(this.btc_usd);
@@ -117,6 +124,45 @@
         },
 
         methods: {
+          loadSettings() {
+            localforage.getItem('api-key')
+              .then(key => {
+                if (key) {
+                  this.settings.apiKey = key;
+                } else {
+                  this.$notify({ title: 'Info', message: 'Please set Poloniex API key in the "Settings" section to unlock trading features.', duration: 5000 });
+                }
+
+                localforage.getItem('secret')
+                  .then(secret => {
+                    if (secret) {
+                      this.settings.secret = secret;
+                    } else {
+                      this.$notify({ title: 'Info', message: 'Please set Poloniex secret in the "Settings" section to unlock trading features', duration: 5000 });
+                    }
+                  })
+                  .catch(err => this.$notify.error({ title: 'Error', message: 'Could not load Poloniex secret from local storage' }));
+              })
+              .catch(err => this.$notify.error({ title: 'Error', message: 'Could not load Poloniex API key from local storage' }));
+          },
+
+          saveSettings() {
+            if (!this.settings.apiKey || !this.settings.secret) {
+              this.$notify.error({ title: 'Error', message: 'The API key and secret cannot be empty!'});
+              return;
+            }
+
+            this.$notify({ title: 'Info', message: 'Saving settings...' });
+
+            Promise.all([
+              localforage.setItem('api-key', this.settings.apiKey)
+                .catch(err => this.$notify.error({ title: 'Error', message: 'Could not save the API key - ' + err })),
+
+              localforage.setItem('secret', this.settings.secret)
+                .catch(err => this.$notify.error({ title: 'Error', message: 'Could not save the secret - ' + err}))
+            ]).then(values => this.$notify({ title: 'Info', message: 'Settings saved' }));
+          },
+
           getRowClassName(row, index) {
             if (row.change < -5) {
               return 'red';
@@ -239,7 +285,20 @@
           </el-col>
         </el-row>
       </el-tab-pane>
-      <el-tab-pane label="Settings" name="settings">Settings...</el-tab-pane>
+      <el-tab-pane label="Settings" name="settings">
+        <el-form ref="form" :model="settings" label-width="120px">
+          <el-form-item label="API Key">
+            <el-input v-model="settings.apiKey"></el-input>
+          </el-form-item>
+          <el-form-item label="API Secret">
+            <el-input v-model="settings.secret"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="saveSettings">Save</el-button>
+            <el-button>Cancel</el-button>
+          </el-form-item>
+        </el-form>
+      </el-tab-pane>
       <el-tab-pane v-bind:label="btc_price" name="btcprice" disabled="true"></el-tab-pane>
     </el-tabs>
 
