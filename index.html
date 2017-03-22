@@ -1,10 +1,12 @@
+<!DOCTYPE html>
 <html>
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-default/index.css">
   <style>
-    body {
+      body {
       font-family: 'Roboto', sans-serif;
     }
     
@@ -20,241 +22,8 @@
   <script src="https://unpkg.com/localforage@1.5.0/dist/localforage.min.js"></script>
   <!--<script src="https://unpkg.com/tween.js@16.3.4"></script>-->
   <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-  <script>
-    window.onload = () => {
-      localforage.config({
-        driver: localforage.LOCALSTORAGE,
-        name: 'polo-terminal'
-      });
-
-      let app = new Vue({
-        el: '#app',
-
-        data: {
-          settings: {
-            apiKey: null,
-            secret: null
-          },
-
-          message: null,
-          tab: 'overview',
-          btc_usd: null,
-
-          positions: [
-            {
-              coin: 'BBR',
-              amount: 71.24999999,
-              amount_btc: 0.01998983,
-              rate_btc: null,
-              worth_btc: null,
-              change: null,
-              pl: null
-            },
-
-            {
-              coin: 'CURE',
-              amount: 232.08469055,
-              amount_btc: 0.00998626,
-              rate_btc: null,
-              worth_btc: null,
-              change: null,
-              pl: null
-            },
-
-            {
-              coin: 'XVC',
-              amount: 213.14102564,
-              amount_btc: 0.0099165,
-              rate_btc: null,
-              worth_btc: null,
-              change: null,
-              pl: null
-            },
-
-            {
-              coin: 'VRC',
-              amount: 339.40115685,
-              amount_btc: 0.00996635,
-              rate_btc: null,
-              worth_btc: null,
-              change: null,
-              pl: null
-            },
-
-            {
-              coin: 'C2',
-              amount: 8750,
-              amount_btc: 0.00999999,
-              rate_btc: null,
-              worth_btc: null,
-              change: null,
-              pl: null
-            },
-
-            {
-              coin: 'MYR',
-              amount: 41562.49999999,
-              amount_btc: 0.00999999,
-              rate_btc: null,
-              worth_btc: null,
-              change: null,
-              pl: null
-            }
-          ]
-        },
-
-        created: function () {
-          this.loadSettings();
-        },
-
-        computed: {
-          btc_price: function () {
-            return 'BTC/USD: $' + parseInt(this.btc_usd);
-          }
-        },
-
-        methods: {
-          loadSettings() {
-            localforage.getItem('api-key')
-              .then(key => {
-                if (key) {
-                  this.settings.apiKey = key;
-                } else {
-                  this.$notify({ title: 'Info', message: 'Please set Poloniex API key in the "Settings" section to unlock trading features.', duration: 5000 });
-                }
-
-                localforage.getItem('secret')
-                  .then(secret => {
-                    if (secret) {
-                      this.settings.secret = secret;
-                    } else {
-                      this.$notify({ title: 'Info', message: 'Please set Poloniex secret in the "Settings" section to unlock trading features', duration: 5000 });
-                    }
-                  })
-                  .catch(err => this.$notify.error({ title: 'Error', message: 'Could not load Poloniex secret from local storage' }));
-              })
-              .catch(err => this.$notify.error({ title: 'Error', message: 'Could not load Poloniex API key from local storage' }));
-          },
-
-          saveSettings() {
-            if (!this.settings.apiKey || !this.settings.secret) {
-              this.$notify.error({ title: 'Error', message: 'The API key and secret cannot be empty!'});
-              return;
-            }
-
-            this.$notify({ title: 'Info', message: 'Saving settings...' });
-
-            Promise.all([
-              localforage.setItem('api-key', this.settings.apiKey)
-                .catch(err => this.$notify.error({ title: 'Error', message: 'Could not save the API key - ' + err })),
-
-              localforage.setItem('secret', this.settings.secret)
-                .catch(err => this.$notify.error({ title: 'Error', message: 'Could not save the secret - ' + err}))
-            ]).then(values => this.$notify({ title: 'Info', message: 'Settings saved' }));
-          },
-
-          getRowClassName(row, index) {
-            if (row.change < -5) {
-              return 'red';
-            } else if (row.change > 5) {
-              return 'green';
-            }
-
-            return '';
-          },
-
-          getChangeFormatter(row, column) {
-            return row.change + '%';
-          },
-
-          getPLFormatter(row, column) {
-            return row.pl < 0 ? '-$' + Math.abs(row.pl) : '$' + row.pl;
-          }
-        }
-      });
-
-      updateTickerData(app);
-
-      setTimeout(() => {
-        setInterval(() => updateTickerData(app), 60000);
-      }, 60000);
-    };
-
-    function updateTickerData(app) {
-      console.log('Updating ticker data...');
-
-      fetch('https://poloniex.com/public?command=returnTicker')
-        .then(resp => {
-          if (resp.status !== 200) {
-            console.log('Failed to retrieve ticker data from Poloniex');
-          }
-
-          resp.json().then(data => {
-            app.btc_usd = data['USDT_BTC'].highestBid;
-
-            app.positions.forEach(pos => {
-              let rate = data['BTC_' + pos.coin].highestBid;
-              let worth = (rate * pos.amount).round(8);
-              let change = (worth * 100 / pos.amount_btc - 100).round(2);
-              pos.rate_btc = rate;
-              pos.worth_btc = worth;
-              pos.change = change;
-              pos.pl = ((worth - pos.amount_btc) * app.btc_usd).round(2);
-            });
-          });
-        })
-        .catch(err => {
-          console.log('Could not connect to Poloniex - ', err);
-        });
-    }
-
-    Number.prototype.round = function (places) {
-      return +(Math.round(this + "e+" + places) + "e-" + places);
-    }
-
-    Vue.component('animated-integer', {
-      template: '<span>{{ tweeningValue }}</span>',
-      props: {
-        value: {
-          type: Number,
-          required: true
-        }
-      },
-      data: function () {
-        return {
-          tweeningValue: 0
-        }
-      },
-      watch: {
-        value: function (newValue, oldValue) {
-          this.tween(oldValue, newValue)
-        }
-      },
-      mounted: function () {
-        this.tween(0, this.value)
-      },
-      methods: {
-        tween: function (startValue, endValue) {
-          var vm = this
-          var animationFrame
-          function animate(time) {
-            TWEEN.update(time)
-            animationFrame = requestAnimationFrame(animate)
-          }
-          new TWEEN.Tween({ tweeningValue: startValue })
-            .to({ tweeningValue: endValue }, 500)
-            .onUpdate(function () {
-              vm.tweeningValue = this.tweeningValue.toFixed(0)
-            })
-            .onComplete(function () {
-              cancelAnimationFrame(animationFrame)
-            })
-            .start()
-          animationFrame = requestAnimationFrame(animate)
-        }
-      }
-    })
-  </script>
+  <script src="https://unpkg.com/v-media-query@1.0.3/dist/v-media-query.min.js"></script>
+  <script src="main.js"></script>
 </head>
 
 <body>
@@ -265,10 +34,10 @@
           <el-col :span="24">
             <el-table :data="positions" :row-class-name="getRowClassName" border style="width: 100%">
               <el-table-column prop="coin" label="Coin" width="100"></el-table-column>
-              <el-table-column prop="amount" label="Amount" width="170"></el-table-column>
-              <el-table-column prop="amount_btc" label="Amount (BTC)"></el-table-column>
-              <el-table-column prop="rate_btc" label="Rate (BTC)"></el-table-column>
-              <el-table-column prop="worth_btc" label="Worth (BTC)"></el-table-column>
+              <el-table-column prop="amount" label="Amount" v-if="$mq.resize && $mq.above('768px')"></el-table-column>
+              <el-table-column prop="amount_btc" label="Amount (BTC)" v-if="$mq.resize && $mq.above('1200px')"></el-table-column>
+              <el-table-column prop="rate_btc" label="Rate (BTC)" v-if="$mq.resize && $mq.above('1200px')"></el-table-column>
+              <el-table-column prop="worth_btc" label="Worth (BTC)" v-if="$mq.resize && $mq.above('768px')"></el-table-column>
               <el-table-column prop="change" label="Change" align="center" :formatter="getChangeFormatter"></el-table-column>
               <el-table-column prop="pl" label="P/L" width="120" align="center" :formatter="getPLFormatter"></el-table-column>
             </el-table>
@@ -280,18 +49,16 @@
           <el-form-item label="API Key">
             <el-input v-model="settings.apiKey"></el-input>
           </el-form-item>
-          <el-form-item label="API Secret">
+          <el-form-item label="Secret">
             <el-input v-model="settings.secret"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="saveSettings">Save</el-button>
-            <el-button>Cancel</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
       <el-tab-pane v-bind:label="btc_price" name="btcprice" disabled="true"></el-tab-pane>
     </el-tabs>
-
   </div>
 </body>
 
