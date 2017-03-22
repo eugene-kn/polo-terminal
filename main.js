@@ -67,6 +67,66 @@ window.onload = () => {
           worth_btc: null,
           change: null,
           pl: null
+        },
+
+        {
+          coin: 'NXC',
+          amount: 363.918278,
+          amount_btc: 0.01989786,
+          rate_btc: null,
+          worth_btc: null,
+          change: null,
+          pl: null
+        },
+
+        {
+          coin: 'QTL',
+          amount: 779.60140679,
+          amount_btc: 0.01999999,
+          rate_btc: null,
+          worth_btc: null,
+          change: null,
+          pl: null
+        },
+
+        {
+          coin: 'QORA',
+          amount: 249375,
+          amount_btc: 0.02,
+          rate_btc: null,
+          worth_btc: null,
+          change: null,
+          pl: null
+        },
+
+        {
+          coin: 'STR',
+          amount: 10668.44919786,
+          amount_btc: 0.01999999,
+          rate_btc: null,
+          worth_btc: null,
+          change: null,
+          pl: null
+        },
+
+        {
+          coin: 'BCY',
+          amount: 106.36596289,
+          amount_btc: 0.01999999,
+          rate_btc: null,
+          worth_btc: null,
+          change: null,
+          pl: null
+        },
+
+        {
+          coin: 'RIC',
+          amount: 1558.59375,
+          amount_btc: 0.01967177,
+          rate_btc: null,
+          worth_btc: null,
+          change: null,
+          pl: null
         }
       ]
     },
