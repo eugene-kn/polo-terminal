@@ -30,16 +30,6 @@ window.onload = () => {
         },
 
         {
-          coin: 'XVC',
-          amount: 213.14102564,
-          amount_btc: 0.0099165,
-          rate_btc: null,
-          worth_btc: null,
-          change: null,
-          pl: null
-        },
-
-        {
           coin: 'VRC',
           amount: 339.40115685,
           amount_btc: 0.00996635,
