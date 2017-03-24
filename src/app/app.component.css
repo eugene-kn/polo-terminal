@@ -1,0 +1,30 @@
+table {
+    border: none;
+    width: 98%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+}
+
+thead th {
+    background-color: lightgray;
+    color: black;
+    padding-bottom: 3px;
+    height: 30px;
+}
+
+.green {
+    background: #c5e1a5;
+}
+
+.red {
+    background: #ef9a9a;
+}
+
+#settings-tab .page-content {
+    padding: 10px;
+}
+
+#settings-tab .mdl-textfield {
+    width: 100%;
+}

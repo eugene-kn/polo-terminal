@@ -1,0 +1,62 @@
+<!-- Simple header with fixed tabs. -->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header
+            mdl-layout--fixed-tabs">
+  <header class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+      <!-- Title -->
+      <span class="mdl-layout-title">Polo Terminal</span>
+    </div>
+    <!-- Tabs -->
+    <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+      <a href="#overview-tab" class="mdl-layout__tab is-active">Overview</a>
+      <a href="#settings-tab" class="mdl-layout__tab">Settings</a>
+    </div>
+  </header>
+  <main class="mdl-layout__content">
+    <section class="mdl-layout__tab-panel is-active" id="overview-tab">
+      <div class="page-content">
+        <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+          <thead>
+            <tr>
+              <th class="mdl-data-table__cell--non-numeric">Coin</th>
+              <th [hidden]="smallScreen">Amount</th>
+              <th [hidden]="smallScreen">Amount (BTC)</th>
+              <th [hidden]="smallScreen">Rate (BTC)</th>
+              <th [hidden]="smallScreen">Worth (BTC)</th>
+              <th>Change</th>
+              <th>P/L</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let pos of positions" [ngClass]="pos.cls">
+              <td class="mdl-data-table__cell--non-numeric">{{ pos.coin }}</td>
+              <td [hidden]="smallScreen">{{ pos.amount }}</td>
+              <td [hidden]="smallScreen">{{ pos.amount_btc }}</td>
+              <td [hidden]="smallScreen">{{ pos.rate_btc }}</td>
+              <td [hidden]="smallScreen">{{ pos.worth_btc }}</td>
+              <td>{{ pos.change }}</td>
+              <td>{{ pos.pl }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="mdl-layout__tab-panel" id="settings-tab">
+      <div class="page-content">
+        <form action="#">
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="mdl-textfield__input" type="text" id="api-key">
+            <label class="mdl-textfield__label" for="api-key">API Key</label>
+          </div>
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="mdl-textfield__input" type="text" id="secret">
+            <label class="mdl-textfield__label" for="secret">Secret</label>
+          </div>
+          <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+            Save
+          </button>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>
