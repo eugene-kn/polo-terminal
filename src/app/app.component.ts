@@ -1,4 +1,5 @@
 import { Component, NgZone } from '@angular/core';
+import { LocalStorageService } from 'angular-2-local-storage';
 import math from 'mathjs';
 
 @Component({
@@ -7,8 +8,12 @@ import math from 'mathjs';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  settings = {
+    apiKey: null,
+    secret: null
+  };
+
   smallScreen = false;
-  title = 'app works!';
   btc_usd = null;
 
   positions = [
@@ -43,16 +48,6 @@ export class AppComponent {
     },
 
     {
-      coin: 'NXC',
-      amount: 363.918278,
-      amount_btc: 0.01989786,
-      rate_btc: null,
-      worth_btc: null,
-      change: null,
-      pl: null
-    },
-
-    {
       coin: 'QTL',
       amount: 779.60140679,
       amount_btc: 0.01999999,
@@ -80,10 +75,40 @@ export class AppComponent {
       worth_btc: null,
       change: null,
       pl: null
+    },
+
+    {
+      coin: 'CLAM',
+      amount: 21.01552724,
+      amount_btc: 0.01814082,
+      rate_btc: null,
+      worth_btc: null,
+      change: null,
+      pl: null
+    },
+
+    {
+      coin: 'BCY',
+      amount: 115.33368038,
+      amount_btc: 0.02000623,
+      rate_btc: null,
+      worth_btc: null,
+      change: null,
+      pl: null
+    },
+
+    {
+      coin: 'SDC',
+      amount: 10.63784406,
+      amount_btc: 0.01999999,
+      rate_btc: null,
+      worth_btc: null,
+      change: null,
+      pl: null
     }
   ];
 
-  constructor(ngZone: NgZone) {
+  constructor(private localStorage: LocalStorageService, ngZone: NgZone) {
     window.onresize = (e) => {
       ngZone.run(() => {
         this.detectScreenSize();
@@ -93,6 +118,7 @@ export class AppComponent {
 
   ngOnInit(): void {
     this.detectScreenSize();
+    this.loadSettings();
     this.updateTickerData();
 
     setTimeout(() => {
@@ -102,6 +128,42 @@ export class AppComponent {
 
   detectScreenSize(): void {
     this.smallScreen = window.innerWidth <= 640;
+  }
+
+  loadSettings(): void {
+    this.settings.apiKey = this.localStorage.get('api-key');
+    this.settings.secret = this.localStorage.get('secret');
+
+    // Promise
+    //   .all([localforage.getItem('api-key'), localforage.getItem('secret')])
+    //   .then(([key, secret]) => {
+    //     if (key && secret) {
+    //       this.settings.apiKey = key;
+    //       this.settings.secret = secret;
+    //     } else {
+    //       this.info('Please set Poloniex API key and secret in the "Settings" section to unlock trading features.');
+    //     }
+    //   })
+    //   .catch(err => this.error('Could not load settings'));
+  }
+
+  saveSettings(): void {
+    console.log('Saving settings...');
+
+    if (!this.settings.apiKey || !this.settings.secret) {
+      console.log('The API key and secret cannot be empty!');
+      return;
+    }
+
+    this.localStorage.set('api-key', this.settings.apiKey);
+    this.localStorage.set('secret', this.settings.secret);
+
+    // Promise.all([
+    //   localforage.setItem('api-key', this.settings.apiKey),
+    //   localforage.setItem('secret', this.settings.secret)
+    // ])
+    //   .then(values => this.info('Settings saved'))
+    //   .catch(err => this.error('Could not save settings'));
   }
 
   updateTickerData(): void {
