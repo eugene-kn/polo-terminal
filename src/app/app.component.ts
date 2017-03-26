@@ -78,16 +78,6 @@ export class AppComponent {
     },
 
     {
-      coin: 'SDC',
-      amount: 10.63784406,
-      amount_btc: 0.01999999,
-      rate_btc: null,
-      worth_btc: null,
-      change: null,
-      pl: null
-    },
-
-    {
       coin: 'BCY',
       amount: 186.5066999,
       amount_btc: 0.02860704,
