@@ -18,16 +18,6 @@ export class AppComponent {
 
   positions = [
     {
-      coin: 'VRC',
-      amount: 339.40115685,
-      amount_btc: 0.00996635,
-      rate_btc: null,
-      worth_btc: null,
-      change: null,
-      pl: null
-    },
-
-    {
       coin: 'MYR',
       amount: 41562.49999999,
       amount_btc: 0.00999999,
