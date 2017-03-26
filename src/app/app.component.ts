@@ -105,6 +105,16 @@ export class AppComponent {
       worth_btc: null,
       change: null,
       pl: null
+    },
+
+    {
+      coin: 'STR',
+      amount: 13765.35258621,
+      amount_btc: 0.02770204,
+      rate_btc: null,
+      worth_btc: null,
+      change: null,
+      pl: null
     }
   ];
 
