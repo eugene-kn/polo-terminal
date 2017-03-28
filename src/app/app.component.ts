@@ -61,39 +61,9 @@ export class AppComponent {
     },
 
     {
-      coin: 'BCY',
-      amount: 186.5066999,
-      amount_btc: 0.02860704,
-      rate_btc: null,
-      worth_btc: null,
-      change: null,
-      pl: null
-    },
-
-    {
       coin: 'PASC',
       amount: 82.84539678,
       amount_btc: 0.01999999,
-      rate_btc: null,
-      worth_btc: null,
-      change: null,
-      pl: null
-    },
-
-    {
-      coin: 'GRC',
-      amount: 3537.23223559,
-      amount_btc: 0.02005386,
-      rate_btc: null,
-      worth_btc: null,
-      change: null,
-      pl: null
-    },
-
-    {
-      coin: 'STR',
-      amount: 13765.35258621,
-      amount_btc: 0.02770204,
       rate_btc: null,
       worth_btc: null,
       change: null,
