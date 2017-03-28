@@ -88,6 +88,16 @@ export class AppComponent {
       worth_btc: null,
       change: null,
       pl: null
+    },
+
+    {
+      coin: 'NAUT',
+      amount: 220.36082474,
+      amount_btc: 0.02999999,
+      rate_btc: null,
+      worth_btc: null,
+      change: null,
+      pl: null
     }
   ];
 
