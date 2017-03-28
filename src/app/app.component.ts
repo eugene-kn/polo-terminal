@@ -31,16 +31,6 @@ export class AppComponent {
     },
 
     {
-      coin: 'QORA',
-      amount: 249375,
-      amount_btc: 0.02,
-      rate_btc: null,
-      worth_btc: null,
-      change: null,
-      pl: null
-    },
-
-    {
       coin: 'RIC',
       amount: 1558.59375,
       amount_btc: 0.01967177,
