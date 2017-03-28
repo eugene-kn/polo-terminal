@@ -81,16 +81,6 @@ export class AppComponent {
     },
 
     {
-      coin: 'STEEM',
-      amount: 115.33125216,
-      amount_btc: 0.01996161,
-      rate_btc: null,
-      worth_btc: null,
-      change: null,
-      pl: null
-    },
-
-    {
       coin: 'GRC',
       amount: 3537.23223559,
       amount_btc: 0.02005386,
