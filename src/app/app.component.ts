@@ -81,7 +81,7 @@ export class AppComponent {
       setInterval(() => this.updateTickerData(), 10000);
     }, 10000);
 
-    console.log("Headers:", this.poloniex.getPrivateHeaders({ foo: 'bar' }));
+    // console.log("Headers:", this.poloniex.getPrivateHeaders({ foo: 'bar' }));
   }
 
   detectScreenSize(): void {

@@ -124,7 +124,7 @@ var AppComponent = (function () {
         setTimeout(function () {
             setInterval(function () { return _this.updateTickerData(); }, 10000);
         }, 10000);
-        console.log("Headers:", this.poloniex.getPrivateHeaders({ foo: 'bar' }));
+        // console.log("Headers:", this.poloniex.getPrivateHeaders({ foo: 'bar' }));
     };
     AppComponent.prototype.detectScreenSize = function () {
         this.smallScreen = window.innerWidth <= 700;
