@@ -1,14 +1,14 @@
 import { Component, NgZone } from '@angular/core';
 import { LocalStorageService } from 'angular-2-local-storage';
 import math from 'mathjs';
-// import PoloniexService from './poloniex.service';
+import { PoloniexService } from './poloniex.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  // providers: [PoloniexService]
-  providers: []
+  providers: [PoloniexService]
+  // providers: []
 })
 export class AppComponent {
   settings = {
@@ -21,29 +21,9 @@ export class AppComponent {
 
   positions = [
     {
-      coin: 'RIC',
-      amount: 1558.59375,
-      amount_btc: 0.01967177,
-      rate_btc: null,
-      worth_btc: null,
-      change: null,
-      pl: null
-    },
-
-    {
       coin: 'CLAM',
       amount: 21.01552724,
       amount_btc: 0.01814082,
-      rate_btc: null,
-      worth_btc: null,
-      change: null,
-      pl: null
-    },
-
-    {
-      coin: 'PASC',
-      amount: 82.84539678,
-      amount_btc: 0.01999999,
       rate_btc: null,
       worth_btc: null,
       change: null,
@@ -82,8 +62,8 @@ export class AppComponent {
   ];
 
   constructor(
-    // private localStorage: LocalStorageService, private poloniex: PoloniexService, ngZone: NgZone) {
-    private localStorage: LocalStorageService, ngZone: NgZone) {
+    private localStorage: LocalStorageService, private poloniex: PoloniexService, ngZone: NgZone) {
+    // private localStorage: LocalStorageService, ngZone: NgZone) {
     window.onresize = (e) => {
       ngZone.run(() => {
         this.detectScreenSize();
@@ -94,14 +74,14 @@ export class AppComponent {
   ngOnInit(): void {
     this.detectScreenSize();
     this.loadSettings();
-    // this.poloniex.init(this.settings.apiKey, this.settings.secret);
+    this.poloniex.init(this.settings.apiKey, this.settings.secret);
     this.updateTickerData();
 
     setTimeout(() => {
       setInterval(() => this.updateTickerData(), 10000);
     }, 10000);
 
-    // console.log("Headers:", this.poloniex.getPrivateHeaders({ foo: 'bar' }));
+    console.log("Headers:", this.poloniex.getPrivateHeaders({ foo: 'bar' }));
   }
 
   detectScreenSize(): void {

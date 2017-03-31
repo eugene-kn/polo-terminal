@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import * as CryptoJS from 'crypto-js';
 
 @Injectable()
-export default class PoloniexService {
+export class PoloniexService {
   private key: string;
   private secret: string;
 
