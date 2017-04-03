@@ -1,14 +1,15 @@
 import { Component, NgZone } from '@angular/core';
 import { LocalStorageService } from 'angular-2-local-storage';
+import { BehaviorSubject } from 'rxjs/Rx';
 import math from 'mathjs';
 import { PoloniexService } from './poloniex.service';
+import Position from './position';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   providers: [PoloniexService]
-  // providers: []
 })
 export class AppComponent {
   settings = {
@@ -17,53 +18,11 @@ export class AppComponent {
   };
 
   smallScreen = false;
-  btc_usd = null;
-
-  positions = [
-    {
-      coin: 'CLAM',
-      amount: 21.01552724,
-      amount_btc: 0.01814082,
-      rate_btc: null,
-      worth_btc: null,
-      change: null,
-      pl: null
-    },
-
-    {
-      coin: 'SC',
-      amount: 36944.44444444,
-      amount_btc: 0.01999999,
-      rate_btc: null,
-      worth_btc: null,
-      change: null,
-      pl: null
-    },
-
-    {
-      coin: 'ZEC',
-      amount: 0.44373554,
-      amount_btc: 0.02370973,
-      rate_btc: null,
-      worth_btc: null,
-      change: null,
-      pl: null
-    },
-
-    {
-      coin: 'NAUT',
-      amount: 220.36082474,
-      amount_btc: 0.02999999,
-      rate_btc: null,
-      worth_btc: null,
-      change: null,
-      pl: null
-    }
-  ];
+  btcRate: BehaviorSubject<number>;
+  positions: Position[];
 
   constructor(
     private localStorage: LocalStorageService, private poloniex: PoloniexService, ngZone: NgZone) {
-    // private localStorage: LocalStorageService, ngZone: NgZone) {
     window.onresize = (e) => {
       ngZone.run(() => {
         this.detectScreenSize();
@@ -74,54 +33,49 @@ export class AppComponent {
   ngOnInit(): void {
     this.detectScreenSize();
     this.loadSettings();
-    this.poloniex.init(this.settings.apiKey, this.settings.secret);
-    this.updateTickerData();
+
+    this.poloniex.init(
+      this.settings.apiKey, this.settings.secret,
+      'http://207.154.233.85:3000/tradingApi'
+    );
+
+    this.btcRate = new BehaviorSubject(0);
 
     setTimeout(() => {
       setInterval(() => this.updateTickerData(), 10000);
     }, 10000);
 
-    // console.log("Headers:", this.poloniex.getPrivateHeaders({ foo: 'bar' }));
+    this.updatePositions();
   }
 
-  detectScreenSize(): void {
-    this.smallScreen = window.innerWidth <= 700;
-  }
+  updatePositions() {
+    console.log('Loading positions...');
+    this.positions = [];
 
-  loadSettings(): void {
-    this.settings.apiKey = this.localStorage.get('api-key');
-    this.settings.secret = this.localStorage.get('secret');
+    this.poloniex.getTradeHistory(new Date('2017-01-01')).subscribe(
+      tradeHistory => {
+        this.poloniex.getCompleteBalances().subscribe(
+          balances => {
+            for (let coin in balances) {
+              if (balances[coin].available > 0 && coin !== 'BTC') {
+                this.positions.push(new Position(
+                  coin, 
+                  balances[coin].available, 
+                  tradeHistory[`BTC_${coin}`][0].total, 
+                  this.btcRate
+                ));
+              }
+            }
 
-    // Promise
-    //   .all([localforage.getItem('api-key'), localforage.getItem('secret')])
-    //   .then(([key, secret]) => {
-    //     if (key && secret) {
-    //       this.settings.apiKey = key;
-    //       this.settings.secret = secret;
-    //     } else {
-    //       this.info('Please set Poloniex API key and secret in the "Settings" section to unlock trading features.');
-    //     }
-    //   })
-    //   .catch(err => this.error('Could not load settings'));
-  }
+            this.updateTickerData();
+          },
 
-  saveSettings(): void {
-    console.log('Saving settings...');
+          err => console.log(`Failed to retrieve balances: ${err}`)
+        );
+      },
 
-    if (!this.settings.apiKey || !this.settings.secret) {
-      console.log('The API key and secret cannot be empty!');
-      return;
-    }
-
-    this.localStorage.set('api-key', this.settings.apiKey);
-    this.localStorage.set('secret', this.settings.secret);
-
-    // Promise.all([
-    //   localforage.setItem('api-key', this.settings.apiKey),
-    //   localforage.setItem('secret', this.settings.secret)
-    // ])
-    //   .then(values => this.info('Settings saved'))
-    //   .catch(err => this.error('Could not save settings'));
+      err => console.log(`Could not donwload trade history: ${err}`)
+    );
   }
 
   updateTickerData(): void {
@@ -134,23 +88,37 @@ export class AppComponent {
           return;
         }
 
-        resp.json().then(data => {
-          this.btc_usd = data['USDT_BTC'].highestBid;
+        resp.json().then(ticker => {
+          this.btcRate.next(ticker['USDT_BTC'].highestBid);
 
           this.positions.forEach(pos => {
-            let rate = data['BTC_' + pos.coin].highestBid;
-            let worth = math.round(rate * pos.amount, 8);
-            let change = math.round(worth * 100 / pos.amount_btc - 100, 2);
-            pos.rate_btc = rate;
-            pos.worth_btc = worth;
-            pos.change = change;
-            pos.pl = math.round((worth - pos.amount_btc) * this.btc_usd, 2);
-            pos['cls'] = change > 5 ? 'green' : change < -5 ? 'red' : '';
+            pos.bid = ticker['BTC_' + pos.coin].highestBid;
           });
         });
       })
       .catch(err => {
-        console.log(`Could not connect to Poloniex (${err})`);
+        console.log(`Could not retrieve ticker: ${err}`);
       });
+  }
+
+  detectScreenSize(): void {
+    this.smallScreen = window.innerWidth <= 700;
+  }
+
+  loadSettings(): void {
+    this.settings.apiKey = this.localStorage.get('api-key');
+    this.settings.secret = this.localStorage.get('secret');
+  }
+
+  saveSettings(): void {
+    console.log('Saving settings...');
+
+    if (!this.settings.apiKey || !this.settings.secret) {
+      console.log('The API key and secret cannot be empty!');
+      return;
+    }
+
+    this.localStorage.set('api-key', this.settings.apiKey);
+    this.localStorage.set('secret', this.settings.secret);
   }
 }

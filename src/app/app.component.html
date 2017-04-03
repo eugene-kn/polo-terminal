@@ -20,20 +20,20 @@
             <tr>
               <th class="mdl-data-table__cell--non-numeric">Coin</th>
               <th [hidden]="smallScreen">Amount</th>
-              <th [hidden]="smallScreen">Amount (BTC)</th>
-              <th [hidden]="smallScreen">Rate (BTC)</th>
+              <th [hidden]="smallScreen">Paid (BTC)</th>
+              <th [hidden]="smallScreen">Bid (BTC)</th>
               <th [hidden]="smallScreen">Worth (BTC)</th>
-              <th>Change</th>
-              <th>P/L</th>
+              <th>Change (%)</th>
+              <th>P/L ($)</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let pos of positions" [ngClass]="pos.cls">
               <td class="mdl-data-table__cell--non-numeric">{{ pos.coin }}</td>
               <td [hidden]="smallScreen">{{ pos.amount }}</td>
-              <td [hidden]="smallScreen">{{ pos.amount_btc }}</td>
-              <td [hidden]="smallScreen">{{ pos.rate_btc }}</td>
-              <td [hidden]="smallScreen">{{ pos.worth_btc }}</td>
+              <td [hidden]="smallScreen">{{ pos.amountInBtc }}</td>
+              <td [hidden]="smallScreen">{{ pos.bid }}</td>
+              <td [hidden]="smallScreen">{{ pos.worthInBtc }}</td>
               <td>{{ pos.change }}</td>
               <td>{{ pos.pl }}</td>
             </tr>
