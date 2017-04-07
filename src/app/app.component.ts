@@ -1,7 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 import { LocalStorageService } from 'angular-2-local-storage';
 import { BehaviorSubject } from 'rxjs/Rx';
-import math from 'mathjs';
 import { PoloniexService } from './poloniex.service';
 import Position from './position';
 
