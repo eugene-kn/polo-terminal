@@ -1,14 +1,14 @@
 webpackJsonp([1,4],{
 
-/***/ 1016:
+/***/ 1013:
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(274);
+module.exports = __webpack_require__(271);
 
 
 /***/ }),
 
-/***/ 273:
+/***/ 270:
 /***/ (function(module, exports) {
 
 function webpackEmptyContext(req) {
@@ -17,43 +17,41 @@ function webpackEmptyContext(req) {
 webpackEmptyContext.keys = function() { return []; };
 webpackEmptyContext.resolve = webpackEmptyContext;
 module.exports = webpackEmptyContext;
-webpackEmptyContext.id = 273;
+webpackEmptyContext.id = 270;
 
 
 /***/ }),
 
-/***/ 274:
+/***/ 271:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser_dynamic__ = __webpack_require__(279);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_app_module__ = __webpack_require__(281);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__environments_environment__ = __webpack_require__(284);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser_dynamic__ = __webpack_require__(276);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_app_module__ = __webpack_require__(278);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__environments_environment__ = __webpack_require__(281);
 
 
 
 
 if (__WEBPACK_IMPORTED_MODULE_3__environments_environment__["a" /* environment */].production) {
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["enableProdMode"])();
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["a" /* enableProdMode */])();
 }
 __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__angular_platform_browser_dynamic__["a" /* platformBrowserDynamic */])().bootstrapModule(__WEBPACK_IMPORTED_MODULE_2__app_app_module__["a" /* AppModule */]);
 //# sourceMappingURL=main.js.map
 
 /***/ }),
 
-/***/ 280:
+/***/ 277:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_angular_2_local_storage__ = __webpack_require__(166);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_angular_2_local_storage___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_angular_2_local_storage__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Rx__ = __webpack_require__(238);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Rx___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_Rx__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__poloniex_service__ = __webpack_require__(282);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__position__ = __webpack_require__(283);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rxjs_Rx__ = __webpack_require__(236);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rxjs_Rx___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_rxjs_Rx__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__poloniex_service__ = __webpack_require__(279);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__position__ = __webpack_require__(280);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppComponent; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -68,11 +66,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-
 var AppComponent = (function () {
-    function AppComponent(localStorage, poloniex, ngZone) {
+    function AppComponent(poloniex, ngZone) {
         var _this = this;
-        this.localStorage = localStorage;
         this.poloniex = poloniex;
         this.settings = {
             apiKey: null,
@@ -89,12 +85,16 @@ var AppComponent = (function () {
         var _this = this;
         this.detectScreenSize();
         this.loadSettings();
+        if (!this.settings.apiKey || !this.settings.secret) {
+            alert('Missing Poloniex API key and secret!');
+            return;
+        }
         this.poloniex.init(this.settings.apiKey, this.settings.secret, 'http://207.154.233.85:3000/tradingApi');
-        this.btcRate = new __WEBPACK_IMPORTED_MODULE_2_rxjs_Rx__["BehaviorSubject"](0);
+        this.btcRate = new __WEBPACK_IMPORTED_MODULE_1_rxjs_Rx__["BehaviorSubject"](0);
+        this.updatePositions();
         setTimeout(function () {
             setInterval(function () { return _this.updateTickerData(); }, 10000);
         }, 10000);
-        this.updatePositions();
     };
     AppComponent.prototype.updatePositions = function () {
         var _this = this;
@@ -104,12 +104,12 @@ var AppComponent = (function () {
             _this.poloniex.getCompleteBalances().subscribe(function (balances) {
                 for (var coin in balances) {
                     if (balances[coin].available > 0 && coin !== 'BTC') {
-                        _this.positions.push(new __WEBPACK_IMPORTED_MODULE_4__position__["a" /* default */](coin, balances[coin].available, tradeHistory["BTC_" + coin][0].total, _this.btcRate));
+                        _this.positions.push(new __WEBPACK_IMPORTED_MODULE_3__position__["a" /* default */](coin, balances[coin].available, tradeHistory["BTC_" + coin][0].total, _this.btcRate));
                     }
                 }
                 _this.updateTickerData();
-            }, function (err) { return console.log("Failed to retrieve balances: " + err); });
-        }, function (err) { return console.log("Could not donwload trade history: " + err); });
+            }, function (err) { return alert("Failed to retrieve balances: " + err); });
+        }, function (err) { return alert("Could not donwload trade history: " + err); });
     };
     AppComponent.prototype.updateTickerData = function () {
         var _this = this;
@@ -135,8 +135,9 @@ var AppComponent = (function () {
         this.smallScreen = window.innerWidth <= 700;
     };
     AppComponent.prototype.loadSettings = function () {
-        this.settings.apiKey = this.localStorage.get('api-key');
-        this.settings.secret = this.localStorage.get('secret');
+        console.log('Loading settings...');
+        this.settings.apiKey = localStorage.getItem('polo-terminal.api-key');
+        this.settings.secret = localStorage.getItem('polo-terminal.secret');
     };
     AppComponent.prototype.saveSettings = function () {
         console.log('Saving settings...');
@@ -144,37 +145,36 @@ var AppComponent = (function () {
             console.log('The API key and secret cannot be empty!');
             return;
         }
-        this.localStorage.set('api-key', this.settings.apiKey);
-        this.localStorage.set('secret', this.settings.secret);
+        localStorage.setItem('polo-terminal.api-key', this.settings.apiKey);
+        localStorage.setItem('polo-terminal.secret', this.settings.secret);
+        window.location.reload();
     };
     return AppComponent;
 }());
 AppComponent = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Component"])({
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_4" /* Component */])({
         selector: 'app-root',
-        template: __webpack_require__(743),
-        styles: [__webpack_require__(365)],
-        providers: [__WEBPACK_IMPORTED_MODULE_3__poloniex_service__["a" /* PoloniexService */]]
+        template: __webpack_require__(739),
+        styles: [__webpack_require__(361)],
+        providers: [__WEBPACK_IMPORTED_MODULE_2__poloniex_service__["a" /* PoloniexService */]]
     }),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_angular_2_local_storage__["LocalStorageService"] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_angular_2_local_storage__["LocalStorageService"]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_3__poloniex_service__["a" /* PoloniexService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__poloniex_service__["a" /* PoloniexService */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["NgZone"] !== "undefined" && __WEBPACK_IMPORTED_MODULE_0__angular_core__["NgZone"]) === "function" && _c || Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_2__poloniex_service__["a" /* PoloniexService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__poloniex_service__["a" /* PoloniexService */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["k" /* NgZone */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_0__angular_core__["k" /* NgZone */]) === "function" && _b || Object])
 ], AppComponent);
 
-var _a, _b, _c;
+var _a, _b;
 //# sourceMappingURL=app.component.js.map
 
 /***/ }),
 
-/***/ 281:
+/***/ 278:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__ = __webpack_require__(90);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_core__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_forms__ = __webpack_require__(278);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_core__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_forms__ = __webpack_require__(275);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__angular_http__ = __webpack_require__(165);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_angular_2_local_storage__ = __webpack_require__(166);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_angular_2_local_storage___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_angular_2_local_storage__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_component__ = __webpack_require__(280);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_component__ = __webpack_require__(277);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppModule; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -187,28 +187,23 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 
 
-
 var AppModule = (function () {
     function AppModule() {
     }
     return AppModule;
 }());
 AppModule = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__angular_core__["NgModule"])({
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__angular_core__["b" /* NgModule */])({
         declarations: [
-            __WEBPACK_IMPORTED_MODULE_5__app_component__["a" /* AppComponent */]
+            __WEBPACK_IMPORTED_MODULE_4__app_component__["a" /* AppComponent */]
         ],
         imports: [
             __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__["a" /* BrowserModule */],
             __WEBPACK_IMPORTED_MODULE_2__angular_forms__["a" /* FormsModule */],
-            __WEBPACK_IMPORTED_MODULE_3__angular_http__["a" /* HttpModule */],
-            __WEBPACK_IMPORTED_MODULE_4_angular_2_local_storage__["LocalStorageModule"].withConfig({
-                prefix: 'polo-terminal',
-                storageType: 'localStorage'
-            })
+            __WEBPACK_IMPORTED_MODULE_3__angular_http__["a" /* HttpModule */]
         ],
         providers: [],
-        bootstrap: [__WEBPACK_IMPORTED_MODULE_5__app_component__["a" /* AppComponent */]]
+        bootstrap: [__WEBPACK_IMPORTED_MODULE_4__app_component__["a" /* AppComponent */]]
     })
 ], AppModule);
 
@@ -216,21 +211,21 @@ AppModule = __decorate([
 
 /***/ }),
 
-/***/ 282:
+/***/ 279:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_http__ = __webpack_require__(165);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Rx__ = __webpack_require__(238);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Rx__ = __webpack_require__(236);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Rx___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_Rx__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_map__ = __webpack_require__(241);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_map__ = __webpack_require__(239);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_add_operator_map__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_catch__ = __webpack_require__(240);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_catch__ = __webpack_require__(238);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_catch___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_catch__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_crypto_js__ = __webpack_require__(342);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_crypto_js__ = __webpack_require__(338);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_crypto_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_crypto_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_nonce__ = __webpack_require__(741);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_nonce__ = __webpack_require__(737);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_nonce___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_nonce__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return PoloniexService; });
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -296,7 +291,7 @@ var PoloniexService = (function () {
     return PoloniexService;
 }());
 PoloniexService = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["Injectable"])(),
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["c" /* Injectable */])(),
     __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_http__["d" /* Http */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__angular_http__["d" /* Http */]) === "function" && _a || Object])
 ], PoloniexService);
 
@@ -305,11 +300,11 @@ var _a;
 
 /***/ }),
 
-/***/ 283:
+/***/ 280:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mathjs__ = __webpack_require__(368);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mathjs__ = __webpack_require__(364);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mathjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_mathjs__);
 
 var Position = (function () {
@@ -355,7 +350,7 @@ var Position = (function () {
 
 /***/ }),
 
-/***/ 284:
+/***/ 281:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -367,7 +362,7 @@ var environment = {
 
 /***/ }),
 
-/***/ 365:
+/***/ 361:
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(139)();
@@ -385,12 +380,12 @@ module.exports = module.exports.toString();
 
 /***/ }),
 
-/***/ 743:
+/***/ 739:
 /***/ (function(module, exports) {
 
-module.exports = "<!-- Simple header with fixed tabs. -->\n<div class=\"mdl-layout mdl-js-layout mdl-layout--fixed-header\n            mdl-layout--fixed-tabs\">\n  <header class=\"mdl-layout__header\">\n    <div class=\"mdl-layout__header-row\">\n      <!-- Title -->\n      <span class=\"mdl-layout-title\">Polo Terminal</span>\n    </div>\n    <!-- Tabs -->\n    <div class=\"mdl-layout__tab-bar mdl-js-ripple-effect\">\n      <a href=\"#overview-tab\" class=\"mdl-layout__tab is-active\">Overview</a>\n      <a href=\"#settings-tab\" class=\"mdl-layout__tab\">Settings</a>\n    </div>\n  </header>\n  <main class=\"mdl-layout__content\">\n    <section class=\"mdl-layout__tab-panel is-active\" id=\"overview-tab\">\n      <div class=\"page-content\">\n        <table class=\"mdl-data-table mdl-js-data-table mdl-shadow--2dp\">\n          <thead>\n            <tr>\n              <th class=\"mdl-data-table__cell--non-numeric\">Coin</th>\n              <th [hidden]=\"smallScreen\">Amount</th>\n              <th [hidden]=\"smallScreen\">Paid (BTC)</th>\n              <th [hidden]=\"smallScreen\">Bid (BTC)</th>\n              <th [hidden]=\"smallScreen\">Worth (BTC)</th>\n              <th>Change (%)</th>\n              <th>P/L ($)</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr *ngFor=\"let pos of positions\" [ngClass]=\"pos.cls\">\n              <td class=\"mdl-data-table__cell--non-numeric\">{{ pos.coin }}</td>\n              <td [hidden]=\"smallScreen\">{{ pos.amount }}</td>\n              <td [hidden]=\"smallScreen\">{{ pos.amountInBtc }}</td>\n              <td [hidden]=\"smallScreen\">{{ pos.bid }}</td>\n              <td [hidden]=\"smallScreen\">{{ pos.worthInBtc }}</td>\n              <td>{{ pos.change }}</td>\n              <td>{{ pos.pl }}</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </section>\n    <section class=\"mdl-layout__tab-panel\" id=\"settings-tab\">\n      <div class=\"page-content\">\n        <form action=\"#\">\n          <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n            <input [(ngModel)]=\"settings.apiKey\" class=\"mdl-textfield__input\" type=\"text\" id=\"api-key\" [ngModelOptions]=\"{standalone: true}\">\n            <label class=\"mdl-textfield__label\" for=\"api-key\">API Key</label>\n          </div>\n          <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n            <input [(ngModel)]=\"settings.secret\" class=\"mdl-textfield__input\" type=\"text\" id=\"secret\" [ngModelOptions]=\"{standalone: true}\">\n            <label class=\"mdl-textfield__label\" for=\"secret\">Secret</label>\n          </div>\n          <button (click)=\"saveSettings()\" class=\"mdl-button mdl-js-button mdl-button--raised mdl-button--colored\">\n            Save\n          </button>\n        </form>\n      </div>\n    </section>\n  </main>\n</div>"
+module.exports = "<!-- Simple header with fixed tabs. -->\n<div class=\"mdl-layout mdl-js-layout mdl-layout--fixed-header\n            mdl-layout--fixed-tabs\">\n  <header class=\"mdl-layout__header\">\n    <div class=\"mdl-layout__header-row\">\n      <!-- Title -->\n      <span class=\"mdl-layout-title\">Polo Terminal</span>\n    </div>\n    <!-- Tabs -->\n    <div class=\"mdl-layout__tab-bar mdl-js-ripple-effect\">\n      <a href=\"#overview-tab\" class=\"mdl-layout__tab is-active\">Overview</a>\n      <a href=\"#settings-tab\" class=\"mdl-layout__tab\">Settings</a>\n    </div>\n  </header>\n  <main class=\"mdl-layout__content\">\n    <section class=\"mdl-layout__tab-panel is-active\" id=\"overview-tab\">\n      <div class=\"page-content\">\n        <table class=\"mdl-data-table mdl-js-data-table mdl-shadow--2dp\">\n          <thead>\n            <tr>\n              <th class=\"mdl-data-table__cell--non-numeric\">Coin</th>\n              <th [hidden]=\"smallScreen\">Amount</th>\n              <th [hidden]=\"smallScreen\">Paid (BTC)</th>\n              <th [hidden]=\"smallScreen\">Bid (BTC)</th>\n              <th [hidden]=\"smallScreen\">Worth (BTC)</th>\n              <th>Change (%)</th>\n              <th>P/L ($)</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr *ngFor=\"let pos of positions\" [ngClass]=\"pos.cls\">\n              <td class=\"mdl-data-table__cell--non-numeric\">{{ pos.coin }}</td>\n              <td [hidden]=\"smallScreen\">{{ pos.amount }}</td>\n              <td [hidden]=\"smallScreen\">{{ pos.amountInBtc }}</td>\n              <td [hidden]=\"smallScreen\">{{ pos.bid }}</td>\n              <td [hidden]=\"smallScreen\">{{ pos.worthInBtc }}</td>\n              <td>{{ pos.change }}</td>\n              <td>{{ pos.pl }}</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </section>\n    <section class=\"mdl-layout__tab-panel\" id=\"settings-tab\">\n      <div class=\"page-content\">\n        <form action=\"#\">\n          <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n            <input [(ngModel)]=\"settings.apiKey\" class=\"mdl-textfield__input\" type=\"text\" name=\"api-key\">\n            <label class=\"mdl-textfield__label\" for=\"api-key\">API Key</label>\n          </div>\n          <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n            <input [(ngModel)]=\"settings.secret\" class=\"mdl-textfield__input\" type=\"text\" name=\"secret\">\n            <label class=\"mdl-textfield__label\" for=\"secret\">Secret</label>\n          </div>\n          <button (click)=\"saveSettings()\" class=\"mdl-button mdl-js-button mdl-button--raised mdl-button--colored\">\n            Save\n          </button>\n        </form>\n      </div>\n    </section>\n  </main>\n</div>"
 
 /***/ })
 
-},[1016]);
+},[1013]);
 //# sourceMappingURL=main.bundle.js.map

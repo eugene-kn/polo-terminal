@@ -45,11 +45,11 @@
       <div class="page-content">
         <form action="#">
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-            <input [(ngModel)]="settings.apiKey" class="mdl-textfield__input" type="text" id="api-key" [ngModelOptions]="{standalone: true}">
+            <input [(ngModel)]="settings.apiKey" class="mdl-textfield__input" type="text" name="api-key">
             <label class="mdl-textfield__label" for="api-key">API Key</label>
           </div>
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-            <input [(ngModel)]="settings.secret" class="mdl-textfield__input" type="text" id="secret" [ngModelOptions]="{standalone: true}">
+            <input [(ngModel)]="settings.secret" class="mdl-textfield__input" type="text" name="secret">
             <label class="mdl-textfield__label" for="secret">Secret</label>
           </div>
           <button (click)="saveSettings()" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">

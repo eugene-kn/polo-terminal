@@ -1,5 +1,4 @@
 import { Component, NgZone } from '@angular/core';
-import { LocalStorageService } from 'angular-2-local-storage';
 import { BehaviorSubject } from 'rxjs/Rx';
 import { PoloniexService } from './poloniex.service';
 import Position from './position';
@@ -20,8 +19,7 @@ export class AppComponent {
   btcRate: BehaviorSubject<number>;
   positions: Position[];
 
-  constructor(
-    private localStorage: LocalStorageService, private poloniex: PoloniexService, ngZone: NgZone) {
+  constructor(private poloniex: PoloniexService, ngZone: NgZone) {
     window.onresize = (e) => {
       ngZone.run(() => {
         this.detectScreenSize();
@@ -33,18 +31,22 @@ export class AppComponent {
     this.detectScreenSize();
     this.loadSettings();
 
+    if (!this.settings.apiKey || !this.settings.secret) {
+      alert('Missing Poloniex API key and secret!');
+      return;
+    }
+
     this.poloniex.init(
       this.settings.apiKey, this.settings.secret,
       'http://207.154.233.85:3000/tradingApi'
     );
 
     this.btcRate = new BehaviorSubject(0);
+    this.updatePositions();
 
     setTimeout(() => {
       setInterval(() => this.updateTickerData(), 10000);
     }, 10000);
-
-    this.updatePositions();
   }
 
   updatePositions() {
@@ -69,11 +71,11 @@ export class AppComponent {
             this.updateTickerData();
           },
 
-          err => console.log(`Failed to retrieve balances: ${err}`)
+          err => alert(`Failed to retrieve balances: ${err}`)
         );
       },
 
-      err => console.log(`Could not donwload trade history: ${err}`)
+      err => alert(`Could not donwload trade history: ${err}`)
     );
   }
 
@@ -105,8 +107,9 @@ export class AppComponent {
   }
 
   loadSettings(): void {
-    this.settings.apiKey = this.localStorage.get('api-key');
-    this.settings.secret = this.localStorage.get('secret');
+    console.log('Loading settings...');
+    this.settings.apiKey = localStorage.getItem('polo-terminal.api-key');
+    this.settings.secret = localStorage.getItem('polo-terminal.secret');
   }
 
   saveSettings(): void {
@@ -117,7 +120,8 @@ export class AppComponent {
       return;
     }
 
-    this.localStorage.set('api-key', this.settings.apiKey);
-    this.localStorage.set('secret', this.settings.secret);
+    localStorage.setItem('polo-terminal.api-key', this.settings.apiKey);
+    localStorage.setItem('polo-terminal.secret', this.settings.secret);
+    window.location.reload();
   }
 }
