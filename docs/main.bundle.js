@@ -89,7 +89,7 @@ var AppComponent = (function () {
             alert('Missing Poloniex API key and secret!');
             return;
         }
-        this.poloniex.init(this.settings.apiKey, this.settings.secret, 'http://207.154.233.85:3000/tradingApi');
+        this.poloniex.init(this.settings.apiKey, this.settings.secret, 'https://mastervip.xyz/tradingApi');
         this.btcRate = new __WEBPACK_IMPORTED_MODULE_1_rxjs_Rx__["BehaviorSubject"](0);
         this.updatePositions();
         setTimeout(function () {
@@ -103,8 +103,17 @@ var AppComponent = (function () {
         this.poloniex.getTradeHistory(new Date('2017-01-01')).subscribe(function (tradeHistory) {
             _this.poloniex.getCompleteBalances().subscribe(function (balances) {
                 for (var coin in balances) {
-                    if (balances[coin].available > 0 && coin !== 'BTC') {
-                        _this.positions.push(new __WEBPACK_IMPORTED_MODULE_3__position__["a" /* default */](coin, balances[coin].available, tradeHistory["BTC_" + coin][0].total, _this.btcRate));
+                    var availableBalance = parseFloat(balances[coin].available);
+                    if (availableBalance > 0 && coin !== 'BTC') {
+                        var amount = 0;
+                        var amountInBtc = 0;
+                        var i = 0;
+                        while (amount < availableBalance) {
+                            amount += parseFloat(tradeHistory["BTC_" + coin][i].amount);
+                            amountInBtc += parseFloat(tradeHistory["BTC_" + coin][i].total);
+                            i++;
+                        }
+                        _this.positions.push(new __WEBPACK_IMPORTED_MODULE_3__position__["a" /* default */](coin, availableBalance, amountInBtc, _this.btcRate));
                     }
                 }
                 _this.updateTickerData();

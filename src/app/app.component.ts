@@ -38,7 +38,7 @@ export class AppComponent {
 
     this.poloniex.init(
       this.settings.apiKey, this.settings.secret,
-      'http://207.154.233.85:3000/tradingApi'
+      'https://mastervip.xyz/tradingApi'
     );
 
     this.btcRate = new BehaviorSubject(0);
@@ -58,11 +58,23 @@ export class AppComponent {
         this.poloniex.getCompleteBalances().subscribe(
           balances => {
             for (let coin in balances) {
-              if (balances[coin].available > 0 && coin !== 'BTC') {
+              let availableBalance = parseFloat(balances[coin].available);
+
+              if (availableBalance > 0 && coin !== 'BTC') {
+                let amount = 0;
+                let amountInBtc = 0;
+                let i = 0;
+
+                while (amount < availableBalance) {
+                  amount += parseFloat(tradeHistory[`BTC_${coin}`][i].amount);
+                  amountInBtc += parseFloat(tradeHistory[`BTC_${coin}`][i].total);
+                  i++;
+                }
+
                 this.positions.push(new Position(
                   coin, 
-                  balances[coin].available, 
-                  tradeHistory[`BTC_${coin}`][0].total, 
+                  availableBalance, 
+                  amountInBtc, 
                   this.btcRate
                 ));
               }

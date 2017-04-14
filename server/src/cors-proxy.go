@@ -21,7 +21,7 @@ var (
 	// host:port to connect to.
 	portTo = "poloniex.com:443"
 	// host:port to listen.
-	listen = "0.0.0.0:3000"
+	listen = "0.0.0.0:443"
 	// scheme to proxy
 	scheme = "https"
 	// verbose message.
@@ -131,7 +131,8 @@ func main() {
 	flag.Parse()
 
 	validateFlags()
+
 	http.HandleFunc("/", handleReverseRequest)
 	log.Println(listen, "-->", portTo)
-	http.ListenAndServe(listen, nil)
+	http.ListenAndServeTLS(listen, "/etc/letsencrypt/live/mastervip.xyz/fullchain.pem", "/etc/letsencrypt/live/mastervip.xyz/privkey.pem", nil)
 }
