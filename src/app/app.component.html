@@ -4,16 +4,16 @@
   <header class="mdl-layout__header">
     <div class="mdl-layout__header-row">
       <!-- Title -->
-      <span class="mdl-layout-title">Polo Terminal</span>
+      <span class="mdl-layout-title"><span [hidden]="smallScreen">Polo Terminal - </span>Balance: {{ btc.getValue() }} BTC (${{ usd.getValue() }})</span>
     </div>
     <!-- Tabs -->
     <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
-      <a href="#overview-tab" class="mdl-layout__tab is-active">Overview</a>
+      <a href="#positions-tab" class="mdl-layout__tab is-active">Positions</a>
       <a href="#settings-tab" class="mdl-layout__tab">Settings</a>
     </div>
   </header>
   <main class="mdl-layout__content">
-    <section class="mdl-layout__tab-panel is-active" id="overview-tab">
+    <section class="mdl-layout__tab-panel is-active" id="positions-tab">
       <div class="page-content">
         <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
           <thead>
@@ -25,6 +25,7 @@
               <th [hidden]="smallScreen">Worth (BTC)</th>
               <th>Change (%)</th>
               <th>P/L ($)</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -36,6 +37,9 @@
               <td [hidden]="smallScreen">{{ pos.worthInBtc }}</td>
               <td>{{ pos.change }}</td>
               <td>{{ pos.pl }}</td>
+              <td>
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" (click)="closePosition(pos)">Close</button>
+              </td>
             </tr>
           </tbody>
         </table>

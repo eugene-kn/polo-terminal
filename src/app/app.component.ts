@@ -1,5 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/Rx';
+import MathJS from 'mathjs';
 import { PoloniexService } from './poloniex.service';
 import Position from './position';
 
@@ -16,6 +17,8 @@ export class AppComponent {
   };
 
   smallScreen = false;
+  btc: BehaviorSubject<number>;
+  usd: BehaviorSubject<number>;
   btcRate: BehaviorSubject<number>;
   positions: Position[];
 
@@ -41,6 +44,8 @@ export class AppComponent {
       'https://mastervip.xyz/tradingApi'
     );
 
+    this.btc = new BehaviorSubject(0);
+    this.usd = new BehaviorSubject(0);
     this.btcRate = new BehaviorSubject(0);
     this.updatePositions();
 
@@ -57,29 +62,39 @@ export class AppComponent {
       tradeHistory => {
         this.poloniex.getCompleteBalances().subscribe(
           balances => {
+            let btcBalance = 0;
+
             for (let coin in balances) {
               let availableBalance = parseFloat(balances[coin].available);
 
-              if (availableBalance > 0 && coin !== 'BTC') {
-                let amount = 0;
-                let amountInBtc = 0;
-                let i = 0;
+              if (availableBalance > 0) {
+                if (coin == 'BTC') {
+                  btcBalance += availableBalance + parseFloat(balances[coin].onOrders);
+                } else {
+                  let amount = 0;
+                  let amountInBtc = 0;
+                  let i = 0;
 
-                while (amount < availableBalance) {
-                  amount += parseFloat(tradeHistory[`BTC_${coin}`][i].amount);
-                  amountInBtc += parseFloat(tradeHistory[`BTC_${coin}`][i].total);
-                  i++;
+                  while (amount < availableBalance) {
+                    amount += parseFloat(tradeHistory[`BTC_${coin}`][i].amount);
+                    amountInBtc += parseFloat(tradeHistory[`BTC_${coin}`][i].total);
+                    i++;
+                  }
+
+                  this.positions.push(new Position(
+                    coin,
+                    availableBalance,
+                    amountInBtc,
+                    this.btcRate
+                  ));
+
+                  btcBalance += parseFloat(balances[coin].btcValue);
                 }
-
-                this.positions.push(new Position(
-                  coin, 
-                  availableBalance, 
-                  amountInBtc, 
-                  this.btcRate
-                ));
               }
             }
 
+            btcBalance = MathJS.round(btcBalance, 8);
+            this.btc.next(btcBalance);
             this.updateTickerData();
           },
 
@@ -103,6 +118,7 @@ export class AppComponent {
 
         resp.json().then(ticker => {
           this.btcRate.next(ticker['USDT_BTC'].highestBid);
+          this.usd.next(MathJS.round(this.btc.getValue() * this.btcRate.getValue(), 2));
 
           this.positions.forEach(pos => {
             pos.bid = ticker['BTC_' + pos.coin].highestBid;
@@ -112,6 +128,35 @@ export class AppComponent {
       .catch(err => {
         console.log(`Could not retrieve ticker: ${err}`);
       });
+  }
+
+  closePosition(pos: Position) {
+    if (!confirm(`About to market-sell ${pos.amount} of ${pos.coin}. OK?`)) {
+      return;
+    }
+
+    this.poloniex.closePosition(pos).subscribe(resp => {
+      // if (resp.status !== 200) {
+      //   alert("Something went wrong (see console)");
+      //   console.log(resp);
+      //   return;
+      // }
+
+      try {
+        let tradeLog = "Latest Trades:\n\n";
+        let trades = resp.json().resultingTrades;
+
+        for (let i = 0; i < trades.length; i++) {
+          tradeLog += `${trades[i].date} - sold ${trades[i].amount} of ${pos.coin} at ${trades[i].rate}\n`;
+        }
+
+        alert(tradeLog);
+        this.updatePositions();
+      } catch(err) {
+        alert("Bad response from Poloniex API (see console)");
+        console.log(resp);
+      }
+    });
   }
 
   detectScreenSize(): void {

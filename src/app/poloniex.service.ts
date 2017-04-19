@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import { Http, Response, Headers, RequestOptions, ResponseOptions } from '@angular/http';
 import {Observable} from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import * as CryptoJS from 'crypto-js';
 import nonce from 'nonce';
+import Position from './position';
 
 @Injectable()
 export class PoloniexService {
@@ -36,6 +37,27 @@ export class PoloniexService {
   getOpenOrders(): Observable<Response> {
     return this.invokeTradingMethod('returnOpenOrders', { currencyPair: 'all' });
   }
+
+  closePosition(position: Position): Observable<Response> {
+    return this.invokeTradingMethod('sell', {
+      'currencyPair': `BTC_${position.coin}`,
+      'amount': position.amount,
+      'rate': position.bid * 0.9,
+      'immediateOrCancel': 1
+    });
+  }
+
+  // private invokeTradingMethodTest(method: string, params = {}): Observable<Response> {
+  //   console.log("invokeTradingMethodTest", method, params);
+
+  //   return new Observable(observer => {
+  //     let json = `{"orderNumber":"35523807750","resultingTrades":[{"amount":"108.50874733","date":"2017-04-18 23:45:31","rate":"0.00002728","total":"0.00296011","tradeID":"3855488","type":"sell"},{"amount":"614.31733962","date":"2017-04-18 23:45:31","rate":"0.00002727","total":"0.01675243","tradeID":"3855489","type":"sell"}],"amountUnfilled":"0.00000000"}`;
+
+  //     setTimeout(() => {
+  //       observer.next(new Response(new ResponseOptions({ status: 200, body: json })))
+  //     }, 2000);
+  //   });
+  // }
 
   private invokeTradingMethod(method: string, params = {}) {
     params['command'] = method;
