@@ -13,6 +13,7 @@ export class PoloniexService {
   private secret: string;
   private apiUrl: string;
   private nonce: any;
+  debug: boolean = false;
 
   constructor(private http: Http) { }
 
@@ -21,6 +22,10 @@ export class PoloniexService {
     this.secret = secret;
     this.apiUrl = apiUrl;
     this.nonce = nonce();
+
+    if (this.debug) {
+      this.apiUrl = 'http://localhost/tradingApi';
+    }
   }
 
   getCompleteBalances(): Observable<Response> {
@@ -47,18 +52,6 @@ export class PoloniexService {
     });
   }
 
-  // private invokeTradingMethodTest(method: string, params = {}): Observable<Response> {
-  //   console.log("invokeTradingMethodTest", method, params);
-
-  //   return new Observable(observer => {
-  //     let json = `{"orderNumber":"35523807750","resultingTrades":[{"amount":"108.50874733","date":"2017-04-18 23:45:31","rate":"0.00002728","total":"0.00296011","tradeID":"3855488","type":"sell"},{"amount":"614.31733962","date":"2017-04-18 23:45:31","rate":"0.00002727","total":"0.01675243","tradeID":"3855489","type":"sell"}],"amountUnfilled":"0.00000000"}`;
-
-  //     setTimeout(() => {
-  //       observer.next(new Response(new ResponseOptions({ status: 200, body: json })))
-  //     }, 2000);
-  //   });
-  // }
-
   private invokeTradingMethod(method: string, params = {}) {
     params['command'] = method;
     params['nonce'] = this.nonce();
@@ -67,7 +60,7 @@ export class PoloniexService {
 
     return this.http.post(this.apiUrl, this.stringifyParams(params), options)
       .map((res: Response) => res.json())
-      .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
+      .catch((error: any) => Observable.throw(error.json().error || error));
   }
 
   private stringifyParams(params: {}): string {
@@ -78,11 +71,17 @@ export class PoloniexService {
 
   private getHeaders(params: {}): Headers {
     let paramString = this.stringifyParams(params);
-
-    return new Headers({
+    
+    let headers = new Headers({
       'Key': this.key,
       'Sign': CryptoJS.HmacSHA512(paramString, this.secret).toString(),
       'Content-Type': 'application/x-www-form-urlencoded'
     });
+
+    if (this.debug) {
+      headers.append('X-Command', params['command']);
+    }
+    
+    return headers;
   }
 }

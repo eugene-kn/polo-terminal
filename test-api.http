@@ -1,0 +1,28 @@
+OPTIONS http://localhost/tradingApi
+
+###
+
+POST http://localhost/tradingApi
+x-command: sell
+
+command=sell
+
+###
+
+POST http://localhost/tradingApi
+x-command: returnTradeHistory
+
+command=returnTradeHistory
+
+###
+
+POST http://localhost/tradingApi
+x-command: returnCompleteBalances
+
+command=returnCompleteBalances
+
+###
+
+GET http://localhost/tradingApi
+
+command=returnTicker

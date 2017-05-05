@@ -39,6 +39,8 @@ export class AppComponent {
       return;
     }
 
+    // this.poloniex.debug = true;
+
     this.poloniex.init(
       this.settings.apiKey, this.settings.secret,
       'https://mastervip.xyz/tradingApi'
@@ -136,26 +138,15 @@ export class AppComponent {
     }
 
     this.poloniex.closePosition(pos).subscribe(resp => {
-      // if (resp.status !== 200) {
-      //   alert("Something went wrong (see console)");
-      //   console.log(resp);
-      //   return;
-      // }
+      let tradeLog = "Latest Trades:\n\n";
+      let trades = resp['resultingTrades'];
 
-      try {
-        let tradeLog = "Latest Trades:\n\n";
-        let trades = resp.json().resultingTrades;
-
-        for (let i = 0; i < trades.length; i++) {
-          tradeLog += `${trades[i].date} - sold ${trades[i].amount} of ${pos.coin} at ${trades[i].rate}\n`;
-        }
-
-        alert(tradeLog);
-        this.updatePositions();
-      } catch(err) {
-        alert("Bad response from Poloniex API (see console)");
-        console.log(resp);
+      for (let i = 0; i < trades.length; i++) {
+        tradeLog += `${trades[i].date} - sold ${trades[i].amount} of ${pos.coin} at ${trades[i].rate}\n`;
       }
+
+      alert(tradeLog);
+      this.updatePositions();
     });
   }
 

@@ -1,0 +1,7 @@
+HTTP/1.1 200 OK
+Access-Control-Allow-Headers: key,sign,x-command
+Access-Control-Allow-Method: POST
+Access-Control-Allow-Methods: GET, PUT, POST, HEAD, TRACE, DELETE, PATCH, COPY, HEAD, LINK, OPTIONS
+Access-Control-Allow-Origin: *
+Content-Length: 0
+Content-Type: text/plain; charset=utf-8

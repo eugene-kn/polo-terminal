@@ -92,6 +92,7 @@ var AppComponent = (function () {
             alert('Missing Poloniex API key and secret!');
             return;
         }
+        // this.poloniex.debug = true;
         this.poloniex.init(this.settings.apiKey, this.settings.secret, 'https://mastervip.xyz/tradingApi');
         this.btc = new __WEBPACK_IMPORTED_MODULE_1_rxjs_Rx__["BehaviorSubject"](0);
         this.usd = new __WEBPACK_IMPORTED_MODULE_1_rxjs_Rx__["BehaviorSubject"](0);
@@ -161,24 +162,13 @@ var AppComponent = (function () {
             return;
         }
         this.poloniex.closePosition(pos).subscribe(function (resp) {
-            // if (resp.status !== 200) {
-            //   alert("Something went wrong (see console)");
-            //   console.log(resp);
-            //   return;
-            // }
-            try {
-                var tradeLog = "Latest Trades:\n\n";
-                var trades = resp.json().resultingTrades;
-                for (var i = 0; i < trades.length; i++) {
-                    tradeLog += trades[i].date + " - sold " + trades[i].amount + " of " + pos.coin + " at " + trades[i].rate + "\n";
-                }
-                alert(tradeLog);
-                _this.updatePositions();
+            var tradeLog = "Latest Trades:\n\n";
+            var trades = resp['resultingTrades'];
+            for (var i = 0; i < trades.length; i++) {
+                tradeLog += trades[i].date + " - sold " + trades[i].amount + " of " + pos.coin + " at " + trades[i].rate + "\n";
             }
-            catch (err) {
-                alert("Bad response from Poloniex API (see console)");
-                console.log(resp);
-            }
+            alert(tradeLog);
+            _this.updatePositions();
         });
     };
     AppComponent.prototype.detectScreenSize = function () {
@@ -297,12 +287,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var PoloniexService = (function () {
     function PoloniexService(http) {
         this.http = http;
+        this.debug = false;
     }
     PoloniexService.prototype.init = function (key, secret, apiUrl) {
         this.key = key;
         this.secret = secret;
         this.apiUrl = apiUrl;
         this.nonce = __WEBPACK_IMPORTED_MODULE_6_nonce___default()();
+        if (this.debug) {
+            this.apiUrl = 'http://localhost/tradingApi';
+        }
     };
     PoloniexService.prototype.getCompleteBalances = function () {
         return this.invokeTradingMethod('returnCompleteBalances');
@@ -324,15 +318,6 @@ var PoloniexService = (function () {
             'immediateOrCancel': 1
         });
     };
-    // private invokeTradingMethodTest(method: string, params = {}): Observable<Response> {
-    //   console.log("invokeTradingMethodTest", method, params);
-    //   return new Observable(observer => {
-    //     let json = `{"orderNumber":"35523807750","resultingTrades":[{"amount":"108.50874733","date":"2017-04-18 23:45:31","rate":"0.00002728","total":"0.00296011","tradeID":"3855488","type":"sell"},{"amount":"614.31733962","date":"2017-04-18 23:45:31","rate":"0.00002727","total":"0.01675243","tradeID":"3855489","type":"sell"}],"amountUnfilled":"0.00000000"}`;
-    //     setTimeout(() => {
-    //       observer.next(new Response(new ResponseOptions({ status: 200, body: json })))
-    //     }, 2000);
-    //   });
-    // }
     PoloniexService.prototype.invokeTradingMethod = function (method, params) {
         if (params === void 0) { params = {}; }
         params['command'] = method;
@@ -340,7 +325,7 @@ var PoloniexService = (function () {
         var options = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* RequestOptions */]({ headers: this.getHeaders(params) });
         return this.http.post(this.apiUrl, this.stringifyParams(params), options)
             .map(function (res) { return res.json(); })
-            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Rx__["Observable"].throw(error.json().error || 'Server error'); });
+            .catch(function (error) { return __WEBPACK_IMPORTED_MODULE_2_rxjs_Rx__["Observable"].throw(error.json().error || error); });
     };
     PoloniexService.prototype.stringifyParams = function (params) {
         return Object.keys(params).map(function (param) {
@@ -349,11 +334,15 @@ var PoloniexService = (function () {
     };
     PoloniexService.prototype.getHeaders = function (params) {
         var paramString = this.stringifyParams(params);
-        return new __WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Headers */]({
+        var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Headers */]({
             'Key': this.key,
             'Sign': __WEBPACK_IMPORTED_MODULE_5_crypto_js__["HmacSHA512"](paramString, this.secret).toString(),
             'Content-Type': 'application/x-www-form-urlencoded'
         });
+        if (this.debug) {
+            headers.append('X-Command', params['command']);
+        }
+        return headers;
     };
     return PoloniexService;
 }());
