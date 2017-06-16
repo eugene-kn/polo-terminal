@@ -1,0 +1,5 @@
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Content-Type: application/json
+
+{"orderNumber":31226041,"resultingTrades":[{"amount":"338.8732","date":"2014-10-18 23:04:21","rate":"0.00000183","total":"0.01","tradeID":"16165","type":"buy"}]}

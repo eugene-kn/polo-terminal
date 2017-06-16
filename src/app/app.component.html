@@ -4,7 +4,8 @@
   <header class="mdl-layout__header">
     <div class="mdl-layout__header-row">
       <!-- Title -->
-      <span class="mdl-layout-title"><span [hidden]="smallScreen">Polo Terminal - </span>Balance: {{ btc.getValue() }} BTC (${{ usd.getValue() }})</span>
+      <span class="mdl-layout-title"><span [hidden]="smallScreen">Polo Terminal - </span>Balance: {{ btc.getValue() }} <i class="fa fa-btc"></i>
+      (${{ usd.getValue() }})</span>
     </div>
     <!-- Tabs -->
     <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
@@ -13,6 +14,16 @@
     </div>
   </header>
   <main class="mdl-layout__content">
+    <dialog class="mdl-dialog" class="actions">
+      <div class="mdl-dialog__content" id="chartContainer">
+      </div>
+      <div class="mdl-dialog__actions">
+        <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect close" (click)="closePositionDialog()">&#x2716;</button>
+        <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect buy" (click)="addToPosition(currentPosition, 0.01)">Buy 0.01 <i class="fa fa-btc"></i></button>
+        <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect sell" (click)="closePosition(currentPosition)">Sell</button>
+      </div>
+    </dialog>
+
     <section class="mdl-layout__tab-panel is-active" id="positions-tab">
       <div class="page-content">
         <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
@@ -20,26 +31,22 @@
             <tr>
               <th class="mdl-data-table__cell--non-numeric">Coin</th>
               <th [hidden]="smallScreen">Amount</th>
-              <th [hidden]="smallScreen">Paid (BTC)</th>
-              <th [hidden]="smallScreen">Bid (BTC)</th>
-              <th [hidden]="smallScreen">Worth (BTC)</th>
+              <th>Size (<i class="fa fa-btc"></i>)</th>
+              <th [hidden]="smallScreen">Bid (<i class="fa fa-btc"></i>)</th>
+              <th [hidden]="smallScreen">Worth (<i class="fa fa-btc"></i>)</th>
               <th>Change (%)</th>
               <th>P/L ($)</th>
-              <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let pos of positions" [ngClass]="pos.cls">
+            <tr *ngFor="let pos of positions" [ngClass]="pos.cls" (click)="openPositionDialog(pos)">
               <td class="mdl-data-table__cell--non-numeric">{{ pos.coin }}</td>
               <td [hidden]="smallScreen">{{ pos.amount }}</td>
-              <td [hidden]="smallScreen">{{ pos.amountInBtc }}</td>
+              <td>{{ pos.size }}</td>
               <td [hidden]="smallScreen">{{ pos.bid }}</td>
               <td [hidden]="smallScreen">{{ pos.worthInBtc }}</td>
               <td>{{ pos.change }}</td>
               <td>{{ pos.pl }}</td>
-              <td>
-                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" (click)="closePosition(pos)">Close</button>
-              </td>
             </tr>
           </tbody>
         </table>

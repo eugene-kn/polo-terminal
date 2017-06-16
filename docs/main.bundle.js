@@ -149,6 +149,7 @@ var AppComponent = (function () {
                 _this.usd.next(__WEBPACK_IMPORTED_MODULE_2_mathjs___default.a.round(_this.btc.getValue() * _this.btcRate.getValue(), 2));
                 _this.positions.forEach(function (pos) {
                     pos.bid = ticker['BTC_' + pos.coin].highestBid;
+                    pos.ask = ticker['BTC_' + pos.coin].lowestAsk;
                 });
             });
         })
@@ -169,6 +170,23 @@ var AppComponent = (function () {
             }
             alert(tradeLog);
             _this.updatePositions();
+            _this.closePositionDialog();
+        });
+    };
+    AppComponent.prototype.addToPosition = function (pos, btcWorth) {
+        var _this = this;
+        if (!confirm("About to market-buy " + btcWorth + " BTC of " + pos.coin + ". OK?")) {
+            return;
+        }
+        this.poloniex.addToPosition(pos, btcWorth).subscribe(function (resp) {
+            var tradeLog = "Latest Trades:\n\n";
+            var trades = resp['resultingTrades'];
+            for (var i = 0; i < trades.length; i++) {
+                tradeLog += trades[i].date + " - bought " + trades[i].amount + " of " + pos.coin + " at " + trades[i].rate + "\n";
+            }
+            alert(tradeLog);
+            _this.updatePositions();
+            _this.closePositionDialog();
         });
     };
     AppComponent.prototype.detectScreenSize = function () {
@@ -188,6 +206,29 @@ var AppComponent = (function () {
         localStorage.setItem('polo-terminal.api-key', this.settings.apiKey);
         localStorage.setItem('polo-terminal.secret', this.settings.secret);
         window.location.reload();
+    };
+    AppComponent.prototype.openPositionDialog = function (pos) {
+        this.currentPosition = pos;
+        new TradingView.widget({
+            "container_id": "chartContainer",
+            "autosize": true,
+            "symbol": "POLONIEX:" + pos.coin + "BTC",
+            "interval": "D",
+            "timezone": "Etc/UTC",
+            "theme": "White",
+            "style": "1",
+            "locale": "en",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "allow_symbol_change": true,
+            "hideideas": true
+        });
+        var dialog = document.querySelector('dialog');
+        dialog.showModal();
+    };
+    AppComponent.prototype.closePositionDialog = function () {
+        var dialog = document.querySelector('dialog');
+        dialog.close();
     };
     return AppComponent;
 }());
@@ -318,6 +359,14 @@ var PoloniexService = (function () {
             'immediateOrCancel': 1
         });
     };
+    PoloniexService.prototype.addToPosition = function (position, btcWorth) {
+        return this.invokeTradingMethod('buy', {
+            'currencyPair': "BTC_" + position.coin,
+            'amount': btcWorth / position.bid,
+            'rate': position.ask * 0.9,
+            'immediateOrCancel': 1
+        });
+    };
     PoloniexService.prototype.invokeTradingMethod = function (method, params) {
         if (params === void 0) { params = {}; }
         params['command'] = method;
@@ -369,8 +418,16 @@ var Position = (function () {
         this.amount = amount;
         this.amountInBtc = amountInBtc;
         this.bid = 0;
+        this.ask = 0;
         this.btcRate = btcRate;
     }
+    Object.defineProperty(Position.prototype, "size", {
+        get: function () {
+            return __WEBPACK_IMPORTED_MODULE_0_mathjs___default.a.round(this.amountInBtc, 2);
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(Position.prototype, "worthInBtc", {
         get: function () {
             return __WEBPACK_IMPORTED_MODULE_0_mathjs___default.a.round(this.bid * this.amount, 8);
@@ -426,7 +483,7 @@ exports = module.exports = __webpack_require__(139)();
 
 
 // module
-exports.push([module.i, "table {\r\n    border: none;\r\n    width: 98%;\r\n    margin-left: auto;\r\n    margin-right: auto;\r\n    margin-top: 10px;\r\n}\r\n\r\nthead th {\r\n    background-color: lightgray;\r\n    color: black;\r\n    padding-bottom: 3px;\r\n    height: 30px;\r\n}\r\n\r\n.green {\r\n    background: #c5e1a5;\r\n}\r\n\r\n.red {\r\n    background: #ef9a9a;\r\n}\r\n\r\n#settings-tab .page-content {\r\n    padding: 10px;\r\n}\r\n\r\n#settings-tab .mdl-textfield {\r\n    width: 100%;\r\n}\r\n\r\n.mdl-layout__header-row {\r\n    padding-left: 15px;\r\n}\r\n\r\n.mdl-layout-title {\r\n    font-size: medium;\r\n}", ""]);
+exports.push([module.i, "table {\r\n    border: none;\r\n    width: 98%;\r\n    margin-left: auto;\r\n    margin-right: auto;\r\n    margin-top: 10px;\r\n}\r\n\r\nthead th {\r\n    background-color: lightgray;\r\n    color: black;\r\n    padding-bottom: 3px;\r\n    height: 30px;\r\n}\r\n\r\n.green {\r\n    background: #c5e1a5;\r\n}\r\n\r\n.red {\r\n    background: #ef9a9a;\r\n}\r\n\r\n#settings-tab .page-content {\r\n    padding: 10px;\r\n}\r\n\r\n#settings-tab .mdl-textfield {\r\n    width: 100%;\r\n}\r\n\r\n.mdl-layout__header-row {\r\n    padding-left: 15px;\r\n}\r\n\r\n.mdl-layout-title {\r\n    font-size: medium;\r\n}\r\n\r\ndialog.actions {\r\n    height: 95%;\r\n    width: 95%;\r\n    /*padding: 5px;*/\r\n    position: fixed;\r\n    padding: 0px;\r\n    border-width: 0px;\r\n}\r\n\r\ndialog.actions .mdl-dialog__actions {\r\n    padding-top: 18px;\r\n    padding-right: 18px;\r\n}\r\n\r\nbutton.sell {\r\n    background-color: #B2DFDB;\r\n}\r\n\r\nbutton.buy {\r\n    background-color: #FFD54F;\r\n}\r\n\r\n#chartContainer {\r\n    margin-left: auto;\r\n    margin-right: auto;\r\n    width: 100%;\r\n    height: 90%;\r\n    padding: 0px;\r\n    position: relative;\r\n}\r\n\r\n::-webkit-backdrop {\r\n  background-color: rgba(0, 0, 0, 0.5);\r\n}\r\n\r\n::backdrop {\r\n  background-color: rgba(0, 0, 0, 0.5);\r\n}", ""]);
 
 // exports
 
@@ -439,7 +496,7 @@ module.exports = module.exports.toString();
 /***/ 739:
 /***/ (function(module, exports) {
 
-module.exports = "<!-- Simple header with fixed tabs. -->\n<div class=\"mdl-layout mdl-js-layout mdl-layout--fixed-header\n            mdl-layout--fixed-tabs\">\n  <header class=\"mdl-layout__header\">\n    <div class=\"mdl-layout__header-row\">\n      <!-- Title -->\n      <span class=\"mdl-layout-title\"><span [hidden]=\"smallScreen\">Polo Terminal - </span>Balance: {{ btc.getValue() }} BTC (${{ usd.getValue() }})</span>\n    </div>\n    <!-- Tabs -->\n    <div class=\"mdl-layout__tab-bar mdl-js-ripple-effect\">\n      <a href=\"#positions-tab\" class=\"mdl-layout__tab is-active\">Positions</a>\n      <a href=\"#settings-tab\" class=\"mdl-layout__tab\">Settings</a>\n    </div>\n  </header>\n  <main class=\"mdl-layout__content\">\n    <section class=\"mdl-layout__tab-panel is-active\" id=\"positions-tab\">\n      <div class=\"page-content\">\n        <table class=\"mdl-data-table mdl-js-data-table mdl-shadow--2dp\">\n          <thead>\n            <tr>\n              <th class=\"mdl-data-table__cell--non-numeric\">Coin</th>\n              <th [hidden]=\"smallScreen\">Amount</th>\n              <th [hidden]=\"smallScreen\">Paid (BTC)</th>\n              <th [hidden]=\"smallScreen\">Bid (BTC)</th>\n              <th [hidden]=\"smallScreen\">Worth (BTC)</th>\n              <th>Change (%)</th>\n              <th>P/L ($)</th>\n              <th>Action</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr *ngFor=\"let pos of positions\" [ngClass]=\"pos.cls\">\n              <td class=\"mdl-data-table__cell--non-numeric\">{{ pos.coin }}</td>\n              <td [hidden]=\"smallScreen\">{{ pos.amount }}</td>\n              <td [hidden]=\"smallScreen\">{{ pos.amountInBtc }}</td>\n              <td [hidden]=\"smallScreen\">{{ pos.bid }}</td>\n              <td [hidden]=\"smallScreen\">{{ pos.worthInBtc }}</td>\n              <td>{{ pos.change }}</td>\n              <td>{{ pos.pl }}</td>\n              <td>\n                <button class=\"mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect\" (click)=\"closePosition(pos)\">Close</button>\n              </td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </section>\n    <section class=\"mdl-layout__tab-panel\" id=\"settings-tab\">\n      <div class=\"page-content\">\n        <form action=\"#\">\n          <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n            <input [(ngModel)]=\"settings.apiKey\" class=\"mdl-textfield__input\" type=\"text\" name=\"api-key\">\n            <label class=\"mdl-textfield__label\" for=\"api-key\">API Key</label>\n          </div>\n          <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n            <input [(ngModel)]=\"settings.secret\" class=\"mdl-textfield__input\" type=\"text\" name=\"secret\">\n            <label class=\"mdl-textfield__label\" for=\"secret\">Secret</label>\n          </div>\n          <button (click)=\"saveSettings()\" class=\"mdl-button mdl-js-button mdl-button--raised mdl-button--colored\">\n            Save\n          </button>\n        </form>\n      </div>\n    </section>\n  </main>\n</div>"
+module.exports = "<!-- Simple header with fixed tabs. -->\n<div class=\"mdl-layout mdl-js-layout mdl-layout--fixed-header\n            mdl-layout--fixed-tabs\">\n  <header class=\"mdl-layout__header\">\n    <div class=\"mdl-layout__header-row\">\n      <!-- Title -->\n      <span class=\"mdl-layout-title\"><span [hidden]=\"smallScreen\">Polo Terminal - </span>Balance: {{ btc.getValue() }} <i class=\"fa fa-btc\"></i>\n      (${{ usd.getValue() }})</span>\n    </div>\n    <!-- Tabs -->\n    <div class=\"mdl-layout__tab-bar mdl-js-ripple-effect\">\n      <a href=\"#positions-tab\" class=\"mdl-layout__tab is-active\">Positions</a>\n      <a href=\"#settings-tab\" class=\"mdl-layout__tab\">Settings</a>\n    </div>\n  </header>\n  <main class=\"mdl-layout__content\">\n    <dialog class=\"mdl-dialog\" class=\"actions\">\n      <div class=\"mdl-dialog__content\" id=\"chartContainer\">\n      </div>\n      <div class=\"mdl-dialog__actions\">\n        <button type=\"button\" class=\"mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect close\" (click)=\"closePositionDialog()\">&#x2716;</button>\n        <button type=\"button\" class=\"mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect buy\" (click)=\"addToPosition(currentPosition, 0.01)\">Buy 0.01 <i class=\"fa fa-btc\"></i></button>\n        <button type=\"button\" class=\"mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect sell\" (click)=\"closePosition(currentPosition)\">Sell</button>\n      </div>\n    </dialog>\n\n    <section class=\"mdl-layout__tab-panel is-active\" id=\"positions-tab\">\n      <div class=\"page-content\">\n        <table class=\"mdl-data-table mdl-js-data-table mdl-shadow--2dp\">\n          <thead>\n            <tr>\n              <th class=\"mdl-data-table__cell--non-numeric\">Coin</th>\n              <th [hidden]=\"smallScreen\">Amount</th>\n              <th>Size (<i class=\"fa fa-btc\"></i>)</th>\n              <th [hidden]=\"smallScreen\">Bid (<i class=\"fa fa-btc\"></i>)</th>\n              <th [hidden]=\"smallScreen\">Worth (<i class=\"fa fa-btc\"></i>)</th>\n              <th>Change (%)</th>\n              <th>P/L ($)</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr *ngFor=\"let pos of positions\" [ngClass]=\"pos.cls\" (click)=\"openPositionDialog(pos)\">\n              <td class=\"mdl-data-table__cell--non-numeric\">{{ pos.coin }}</td>\n              <td [hidden]=\"smallScreen\">{{ pos.amount }}</td>\n              <td>{{ pos.size }}</td>\n              <td [hidden]=\"smallScreen\">{{ pos.bid }}</td>\n              <td [hidden]=\"smallScreen\">{{ pos.worthInBtc }}</td>\n              <td>{{ pos.change }}</td>\n              <td>{{ pos.pl }}</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </section>\n    <section class=\"mdl-layout__tab-panel\" id=\"settings-tab\">\n      <div class=\"page-content\">\n        <form action=\"#\">\n          <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n            <input [(ngModel)]=\"settings.apiKey\" class=\"mdl-textfield__input\" type=\"text\" name=\"api-key\">\n            <label class=\"mdl-textfield__label\" for=\"api-key\">API Key</label>\n          </div>\n          <div class=\"mdl-textfield mdl-js-textfield mdl-textfield--floating-label\">\n            <input [(ngModel)]=\"settings.secret\" class=\"mdl-textfield__input\" type=\"text\" name=\"secret\">\n            <label class=\"mdl-textfield__label\" for=\"secret\">Secret</label>\n          </div>\n          <button (click)=\"saveSettings()\" class=\"mdl-button mdl-js-button mdl-button--raised mdl-button--colored\">\n            Save\n          </button>\n        </form>\n      </div>\n    </section>\n  </main>\n</div>"
 
 /***/ })
 

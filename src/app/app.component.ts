@@ -4,6 +4,8 @@ import MathJS from 'mathjs';
 import { PoloniexService } from './poloniex.service';
 import Position from './position';
 
+declare var TradingView: any;
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -21,6 +23,7 @@ export class AppComponent {
   usd: BehaviorSubject<number>;
   btcRate: BehaviorSubject<number>;
   positions: Position[];
+  currentPosition: Position;
 
   constructor(private poloniex: PoloniexService, ngZone: NgZone) {
     window.onresize = (e) => {
@@ -124,6 +127,7 @@ export class AppComponent {
 
           this.positions.forEach(pos => {
             pos.bid = ticker['BTC_' + pos.coin].highestBid;
+            pos.ask = ticker['BTC_' + pos.coin].lowestAsk;
           });
         });
       })
@@ -147,6 +151,26 @@ export class AppComponent {
 
       alert(tradeLog);
       this.updatePositions();
+      this.closePositionDialog();
+    });
+  }
+
+  addToPosition(pos: Position, btcWorth: number) {
+    if (!confirm(`About to market-buy ${btcWorth} BTC of ${pos.coin}. OK?`)) {
+      return;
+    }
+
+    this.poloniex.addToPosition(pos, btcWorth).subscribe(resp => {
+      let tradeLog = "Latest Trades:\n\n";
+      let trades = resp['resultingTrades'];
+
+      for (let i = 0; i < trades.length; i++) {
+        tradeLog += `${trades[i].date} - bought ${trades[i].amount} of ${pos.coin} at ${trades[i].rate}\n`;
+      }
+
+      alert(tradeLog);
+      this.updatePositions();
+      this.closePositionDialog();
     });
   }
 
@@ -171,5 +195,32 @@ export class AppComponent {
     localStorage.setItem('polo-terminal.api-key', this.settings.apiKey);
     localStorage.setItem('polo-terminal.secret', this.settings.secret);
     window.location.reload();
+  }
+
+  openPositionDialog(pos: Position): void {
+    this.currentPosition = pos;
+
+    new TradingView.widget({
+      "container_id": "chartContainer",
+      "autosize": true,
+      "symbol": "POLONIEX:" + pos.coin + "BTC",
+      "interval": "D",
+      "timezone": "Etc/UTC",
+      "theme": "White",
+      "style": "1",
+      "locale": "en",
+      "toolbar_bg": "#f1f3f6",
+      "enable_publishing": false,
+      "allow_symbol_change": true,
+      "hideideas": true
+    });
+
+    let dialog: any = <any>document.querySelector('dialog');
+    dialog.showModal();
+  }
+
+  closePositionDialog(): void {
+    let dialog: any = <any>document.querySelector('dialog');
+    dialog.close();
   }
 }

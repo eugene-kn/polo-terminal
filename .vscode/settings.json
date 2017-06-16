@@ -1,3 +1,4 @@
 {
-    "go.gopath": "D:\\Development\\Workspace\\Go;D:\\Development\\Lab\\polo-terminal\\server"
+    "go.gopath": "D:\\Development\\Workspace\\Go;D:\\Development\\Lab\\polo-terminal\\server",
+    "editor.minimap.enabled": false
 }

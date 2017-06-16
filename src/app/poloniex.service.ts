@@ -52,6 +52,15 @@ export class PoloniexService {
     });
   }
 
+  addToPosition(position: Position, btcWorth: number): Observable<Response> {
+    return this.invokeTradingMethod('buy', {
+      'currencyPair': `BTC_${position.coin}`,
+      'amount': btcWorth / position.bid,
+      'rate': position.ask * 0.9,
+      'immediateOrCancel': 1
+    });
+  }
+
   private invokeTradingMethod(method: string, params = {}) {
     params['command'] = method;
     params['nonce'] = this.nonce();

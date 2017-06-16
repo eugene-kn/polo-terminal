@@ -6,6 +6,7 @@ export default class Position {
   readonly amount: number;
   readonly amountInBtc: number;
   bid: number;
+  ask: number;
   btcRate: BehaviorSubject<number>;
 
   constructor(coin: string, amount: number, amountInBtc: number, btcRate?: BehaviorSubject<number>) {
@@ -13,7 +14,12 @@ export default class Position {
     this.amount = amount;
     this.amountInBtc = amountInBtc;
     this.bid = 0;
+    this.ask = 0;
     this.btcRate = btcRate;
+  }
+
+  get size(): number {
+    return MathJS.round(this.amountInBtc, 2);
   }
 
   get worthInBtc(): number {
