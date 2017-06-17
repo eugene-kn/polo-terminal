@@ -220,7 +220,8 @@ var AppComponent = (function () {
             "locale": "en",
             "toolbar_bg": "#f1f3f6",
             "enable_publishing": false,
-            "allow_symbol_change": true,
+            "allow_symbol_change": false,
+            "save_image": false,
             "hideideas": true
         });
         var dialog = document.querySelector('dialog');
@@ -483,7 +484,7 @@ exports = module.exports = __webpack_require__(139)();
 
 
 // module
-exports.push([module.i, "table {\r\n    border: none;\r\n    width: 98%;\r\n    margin-left: auto;\r\n    margin-right: auto;\r\n    margin-top: 10px;\r\n}\r\n\r\nthead th {\r\n    background-color: lightgray;\r\n    color: black;\r\n    padding-bottom: 3px;\r\n    height: 30px;\r\n}\r\n\r\n.green {\r\n    background: #c5e1a5;\r\n}\r\n\r\n.red {\r\n    background: #ef9a9a;\r\n}\r\n\r\n#settings-tab .page-content {\r\n    padding: 10px;\r\n}\r\n\r\n#settings-tab .mdl-textfield {\r\n    width: 100%;\r\n}\r\n\r\n.mdl-layout__header-row {\r\n    padding-left: 15px;\r\n}\r\n\r\n.mdl-layout-title {\r\n    font-size: medium;\r\n}\r\n\r\ndialog.actions {\r\n    height: 95%;\r\n    width: 95%;\r\n    /*padding: 5px;*/\r\n    position: fixed;\r\n    padding: 0px;\r\n    border-width: 0px;\r\n}\r\n\r\ndialog.actions .mdl-dialog__actions {\r\n    padding-top: 18px;\r\n    padding-right: 18px;\r\n}\r\n\r\nbutton.sell {\r\n    background-color: #B2DFDB;\r\n}\r\n\r\nbutton.buy {\r\n    background-color: #FFD54F;\r\n}\r\n\r\n#chartContainer {\r\n    margin-left: auto;\r\n    margin-right: auto;\r\n    width: 100%;\r\n    height: 90%;\r\n    padding: 0px;\r\n    position: relative;\r\n}\r\n\r\n::-webkit-backdrop {\r\n  background-color: rgba(0, 0, 0, 0.5);\r\n}\r\n\r\n::backdrop {\r\n  background-color: rgba(0, 0, 0, 0.5);\r\n}", ""]);
+exports.push([module.i, "table {\r\n    border: none;\r\n    width: 98%;\r\n    margin-left: auto;\r\n    margin-right: auto;\r\n    margin-top: 10px;\r\n}\r\n\r\nthead th {\r\n    background-color: lightgray;\r\n    color: black;\r\n    padding-bottom: 3px;\r\n    height: 30px;\r\n}\r\n\r\n.green {\r\n    background: #c5e1a5;\r\n}\r\n\r\n.red {\r\n    background: #ef9a9a;\r\n}\r\n\r\n#settings-tab .page-content {\r\n    padding: 10px;\r\n}\r\n\r\n#settings-tab .mdl-textfield {\r\n    width: 100%;\r\n}\r\n\r\n.mdl-layout__header-row {\r\n    padding-left: 15px;\r\n}\r\n\r\n.mdl-layout-title {\r\n    font-size: medium;\r\n}\r\n\r\ndialog.actions {\r\n    height: 95%;\r\n    width: 95%;\r\n    /*padding: 5px;*/\r\n    position: fixed;\r\n    padding: 0px;\r\n    border-width: 0px;\r\n}\r\n\r\ndialog.actions .mdl-dialog__actions {\r\n    padding-top: 5px;\r\n    padding-right: 18px;\r\n}\r\n\r\nbutton.sell {\r\n    background-color: #B2DFDB;\r\n}\r\n\r\nbutton.buy {\r\n    background-color: #FFD54F;\r\n}\r\n\r\n#chartContainer {\r\n    margin-left: auto;\r\n    margin-right: auto;\r\n    width: 100%;\r\n    height: 90%;\r\n    padding: 0px;\r\n    position: relative;\r\n}\r\n\r\n::-webkit-backdrop {\r\n  background-color: rgba(0, 0, 0, 0.5);\r\n}\r\n\r\n::backdrop {\r\n  background-color: rgba(0, 0, 0, 0.5);\r\n}", ""]);
 
 // exports
 

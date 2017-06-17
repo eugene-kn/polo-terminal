@@ -211,7 +211,8 @@ export class AppComponent {
       "locale": "en",
       "toolbar_bg": "#f1f3f6",
       "enable_publishing": false,
-      "allow_symbol_change": true,
+      "allow_symbol_change": false,
+      "save_image": false,
       "hideideas": true
     });
 
