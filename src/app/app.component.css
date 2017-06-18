@@ -14,11 +14,19 @@ thead th {
 }
 
 .green {
-    background: #c5e1a5;
+    background: #81C784;
+}
+
+.lightgreen {
+    background: #DCEDC8;
 }
 
 .red {
-    background: #ef9a9a;
+    background: #E57373;
+}
+
+.lightred {
+    background: #FFCDD2;
 }
 
 #settings-tab .page-content {

@@ -33,8 +33,4 @@ export default class Position {
   get pl(): number {
     return MathJS.round((this.worthInBtc - this.amountInBtc) * this.btcRate.getValue(), 2);
   }
-
-  get cls(): string {
-    return this.change > 5 ? 'green' : this.change < -5 ? 'red' : '';
-  }
 }

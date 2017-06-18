@@ -39,10 +39,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let pos of positions" [ngClass]="pos.cls" (click)="openPositionDialog(pos)">
+            <tr *ngFor="let pos of positions" [ngClass]="getPositionClass(pos)" (click)="openPositionDialog(pos)">
               <td class="mdl-data-table__cell--non-numeric">{{ pos.coin }}</td>
               <td [hidden]="smallScreen">{{ pos.amount }}</td>
-              <td>{{ pos.size }}</td>
+              <td><i [hidden]="!okToScaleUp(pos)" class="fa fa-arrow-up"></i> {{ pos.size }}</td>
               <td [hidden]="smallScreen">{{ pos.bid }}</td>
               <td [hidden]="smallScreen">{{ pos.worthInBtc }}</td>
               <td>{{ pos.change }}</td>

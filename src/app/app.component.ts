@@ -224,4 +224,34 @@ export class AppComponent {
     let dialog: any = <any>document.querySelector('dialog');
     dialog.close();
   }
+
+  getPositionClass(pos: Position): string {
+    const usdBalance = this.usd.getValue();
+
+    if (pos.pl <= -usdBalance * 0.005) {
+      return 'red';
+    }
+
+    if (pos.pl <= -usdBalance * 0.0025) {
+      return 'lightred';
+    }
+
+    if (pos.pl >= usdBalance * 0.05) {
+      return 'green';
+    }
+
+    if (pos.pl >= usdBalance * 0.025) {
+      return 'lightgreen';
+    }
+  }
+
+  okToScaleUp(pos: Position): boolean {
+    const btcBalance = this.btc.getValue();
+
+    if (pos.change >= 10 && pos.change <= 15 && pos.size < MathJS.round(btcBalance * 0.1, 2)) {
+      return true;
+    }
+
+    return false;
+  }
 }
