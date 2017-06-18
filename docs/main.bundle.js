@@ -364,7 +364,7 @@ var PoloniexService = (function () {
         return this.invokeTradingMethod('buy', {
             'currencyPair': "BTC_" + position.coin,
             'amount': btcWorth / position.bid,
-            'rate': position.ask * 0.9,
+            'rate': position.ask * 1.1,
             'immediateOrCancel': 1
         });
     };
